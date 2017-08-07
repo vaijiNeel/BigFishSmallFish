@@ -9,6 +9,10 @@
   };
   firebase.initializeApp(config);
 
+  $(document).ready(function(){
+    $('.collapsible').collapsible();
+  });
+
   var database = firebase.database();
   var map = null;
   
