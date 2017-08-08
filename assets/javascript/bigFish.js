@@ -43,8 +43,26 @@
   }
 
   var database = firebase.database();
+
   var map = null;
   var playerName = '';
+  var icons = {
+          level0: {
+            icon: 'assets/images/fish-level-0.png'            
+          },
+          level1: {
+            icon: 'assets/images/fish-level-1.png'
+          },
+          level2: {
+            icon: 'assets/images/fish-level-2.png'
+          },
+          level3: {
+            icon: 'assets/images/fish-level-3.png'
+          },
+          level4: {
+            icon: 'assets/images/fish-level-4.png'
+          }
+        };
   
   function initMap() {
     var uluru = {lat: -25.363, lng: 131.044};
@@ -54,6 +72,7 @@
     });
     var marker = new google.maps.Marker({
       position: uluru,
+      icon: icons.level0.icon,
       map: map
     });
 
@@ -73,13 +92,30 @@
         console.log('Errors handled: ' + errorObject.code);
     });
   }
+
   function saveAddedMarker(latitude, longitude) {
     database.ref().push({lat: latitude, lng: longitude});
   }
+
   function placeMarker(latitude, longitude) {
     var markerLocation = {lat: latitude, lng: longitude};
     var marker = new google.maps.Marker({
       position: markerLocation,
+      icon: icons.level4.icon,
       map: map
     });
+  }
+
+
+  function generateRandomLatLngCPUFish() {
+    var randonLng = 0, randomLat = 0, randomCount=50;
+    var min=-180, max=180, fixed=3;
+    for (var i = 0; i < randomCount; i++) {
+      randomLat = generateRandomLatLng(to, from, fixed);
+      randomLng = generateRandomLatLng(to, from, fixed);      
+    }
+  }
+
+  function generateRandomLatLng(to, from, fixed) {
+    return ( (Math.random() * (to - from) + from).toFixed(fixed) * 1 );
   }
