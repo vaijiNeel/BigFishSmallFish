@@ -31,11 +31,15 @@
     $('#new-fish').on('click', function() {
       $('#new-fish-modal').modal('open');
     });
-    $('#submit-fish-name').on('click', function() {
+    $('#submit-fish-name').on('click', function(event) {
       event.preventDefault();
-      $('#new-fish-modal').modal('close');
-      playerName = $('#record-name').val().trim();
-    })
+      var tmp = $('#record-name').val().trim();
+      if ( tmp == '') {}
+      else {      
+        $('#new-fish-modal').modal('close');
+        playerName = $('#record-name').val().trim();
+      }
+    });
   }
 
   var database = firebase.database();
