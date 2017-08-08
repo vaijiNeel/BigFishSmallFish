@@ -9,12 +9,38 @@
   };
   firebase.initializeApp(config);
 
+  $("#create-fish").on('click', function() {
+    event.preventDefault();
+    playerName = $('#player-name').val().trim();
+    $('#player-name').val('');
+  })
+
   $(document).ready(function(){
     $('.collapsible').collapsible();
+    login();
   });
+
+  function login() {
+    $('#intro-modal, #new-fish-modal').modal({
+      dismissible: false
+    });
+    $('#intro-modal').modal('open');
+    $('#exist-fish').on('click', function() {
+      return;
+    });
+    $('#new-fish').on('click', function() {
+      $('#new-fish-modal').modal('open');
+    });
+    $('#submit-fish-name').on('click', function() {
+      event.preventDefault();
+      $('#new-fish-modal').modal('close');
+      playerName = $('#record-name').val().trim();
+    })
+  }
 
   var database = firebase.database();
   var map = null;
+  var playerName = '';
   
   function initMap() {
     var uluru = {lat: -25.363, lng: 131.044};

@@ -5,7 +5,6 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">	
 	
-	<!-- Link to Bootstrap -->
 	<!-- Compiled and minified CSS -->
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.1/css/materialize.min.css">
 
@@ -31,11 +30,36 @@
 		<div class="main-content row">
 			<div class="col s12" id="map"></div>
 		</div>
+			<!-- Modal Structure -->
+		<div id="intro-modal" class="modal">
+			<div class="modal-content">
+				<h4>Do you have an existing fish?</h4>
+			</div>
+			<div class="modal-footer">
+				<a href="#!" id="exist-fish" class="modal-action modal-close btn-flat ">Yes</a>
+				<a href="#!" id="new-fish" class="modal-action modal-close btn-flat">No</a>
+			</div>
+		</div>
+		<div id="new-fish-modal" class="modal">
+			<div class="modal-content">
+				<form id="username-form">
+					Enter your fish's name<br>
+					<input type="text" name="username" id='record-name'><br>
+					<input type="button" value="Submit" id="submit-fish-name">
+				</form>
+			</div>
+		</div>
 		<div class="info-content row">
 			<ul class="info col s12 collapsible" data-collapsible="accordion">
 				<li>
-					<div class="collapsible-header">Info</div>
-					<div class="collapsible-body">Stuff</div>
+					<div class="collapsible-header">Fish Info</div>
+					<div class="collapsible-body">
+						<form>
+							Fish Name<br>
+							<input type="text" id="player-name"><br>
+							<input type="button" value="Create Fish" id='create-fish'>
+						</form>
+					</div>
 				</li>
 			</ul>
 		</div>
