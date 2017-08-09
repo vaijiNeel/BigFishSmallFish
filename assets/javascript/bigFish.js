@@ -45,11 +45,8 @@
   var database = firebase.database();
 
   var map = null;
-<<<<<<< HEAD
   var timerOn=false;
-=======
   var playerName = '';
->>>>>>> 0a252a08d0f127bf912cc56b8ca953cfe8696209
   var icons = {
           level0: {
             icon: 'assets/images/fish-level-0.png'            
@@ -101,12 +98,8 @@
     var markerLocation = {lat: latitude, lng: longitude};
     var marker = new google.maps.Marker({
       position: markerLocation,
-<<<<<<< HEAD
-      icon: levelImg(level),
-      map: map
-=======
-      map: map,
-      icon: icons.level0.icon,
+      icon: levelImg(level),   
+      map: map,     
       customInfo: {name, level}
     });
     // google.maps.event.addDomListener(window, 'load', initialize);
@@ -124,7 +117,6 @@
       $("#fish-pin-level").text("");
       $("#fish-pin-lat").text("");
       $("#fish-pin-lng").text("");
->>>>>>> 0a252a08d0f127bf912cc56b8ca953cfe8696209
     });
   }
 
