@@ -45,6 +45,7 @@
   var database = firebase.database();
 
   var map = null;
+  var timerOn=false;
   var playerName = '';
   var icons = {
           level0: {
@@ -97,8 +98,8 @@
     var markerLocation = {lat: latitude, lng: longitude};
     var marker = new google.maps.Marker({
       position: markerLocation,
-      map: map,
-      icon: icons.level0.icon,
+      icon: levelImg(level),   
+      map: map,     
       customInfo: {name, level}
     });
     // google.maps.event.addDomListener(window, 'load', initialize);
@@ -119,13 +120,40 @@
     });
   }
 
+  function levelImg(level) {
+    if(level<=10)
+      return icons.level0.icon;
+    else if(level>10 && level<=20)
+      return icons.level1.icon;
+    else if(level>20 && level<=30)
+      return icons.level2.icon;
+    else if(level>30 && level<=40)
+      return icons.level3.icon;
+    else if(level>40)
+      return icons.level4.icon;
+  }
+
+  function stopTimer() {
+    clearTimeout(t);
+    timerOn = false;  
+  }
 
   function generateRandomLatLngCPUFish() {
-    var randonLng = 0, randomLat = 0, randomCount=50;
-    var min=-180, max=180, fixed=3;
+    if (!timerOn) {
+        timerOn = true;
+        intervalId = setInterval(decrement, 1000);
+        getLatLng();
+    }
+    
+  }
+
+  function getLatLng() {
+    
+    var randonLng = 0, randomLat = 0;
     for (var i = 0; i < randomCount; i++) {
-      randomLat = generateRandomLatLng(to, from, fixed);
-      randomLng = generateRandomLatLng(to, from, fixed);      
+      //get random lat/lng
+      randomLat = generateRandomLatLng(90, -90, 3);
+      randomLng = generateRandomLatLng(180, -180, 3);      
     }
   }
 
