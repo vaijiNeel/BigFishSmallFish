@@ -73,7 +73,7 @@
   }
 
   function levelImg(level) {
-    if(level <=10)
+    if(level<=10)
       return icons.level0.icon;
     else if(level>10 && level<=20)
       return icons.level1.icon;
