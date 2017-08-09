@@ -5,8 +5,8 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">	
 	
-	<!-- Link to Bootstrap -->
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+	<!-- Compiled and minified CSS -->
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.1/css/materialize.min.css">
 
 	<!-- Link to css files -->
 	<link rel="stylesheet" type="text/css" href="assets/css/reset.css">	
@@ -21,13 +21,66 @@
 	<!-- Firebase JavaScript Link -->
 	<script src="https://www.gstatic.com/firebasejs/4.2.0/firebase.js"></script>
 
+	<!-- Compiled and minified JavaScript -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.1/js/materialize.min.js"></script>
+
 </head>
 <body>
-	<div class="main-content">
-		<h3>My Google Maps Demo</h3>
-		<div id="map"></div>
-	</script>
-</div>
+
+	<div class="container">
+		<div class="main-content row">
+			<div class="col s12" id="map"></div>
+      <section>
+        <table>
+          <tr>
+            <th>Name: </th>
+            <td id="fish-pin-name"></td>
+          </tr>
+          <tr>
+            <th>Level: </th>
+            <td id="fish-pin-level"></td>
+          </tr>
+          <tr>
+            <th>Latitude: </th>
+            <td id="fish-pin-lat"></td>
+          </tr>
+          <tr>
+            <th>Longitude: </th>
+            <td id="fish-pin-lng"></td>
+          </tr>
+        </table>
+      </section>
+    </div>
+			<!-- Modal Structure -->
+		<div id="intro-modal" class="modal">
+			<div class="modal-content">
+				<h4>Do you have an existing fish?</h4>
+			</div>
+			<div class="modal-footer">
+				<a href="#!" id="exist-fish" class="modal-action modal-close btn-flat ">Yes</a>
+				<a href="#!" id="new-fish" class="modal-action modal-close btn-flat">No</a>
+			</div>
+		</div>
+		<div id="new-fish-modal" class="modal">
+			<div class="modal-content">
+				<form id="username-form">
+					Enter your fish's name<br>
+					<input type="text" name="username" id='record-name'><br>
+					<input type="submit" value="Submit" id="submit-fish-name">
+				</form>
+			</div>
+		</div>
+		<div class="info-content row">
+			<ul class="info col s12 collapsible" data-collapsible="accordion">
+				<li>
+					<div class="collapsible-header">Fish Info</div>
+					<div class="collapsible-body">
+						Test
+					</div>
+				</li>
+			</ul>
+		</div>
+	</div>
 
 <!-- Link to javascript file -->
 <script type='text/javascript' src="assets/javascript/bigFish.js"></script>

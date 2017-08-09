@@ -9,9 +9,47 @@
   };
   firebase.initializeApp(config);
 
+  $("#create-fish").on('click', function() {
+    event.preventDefault();
+    playerName = $('#player-name').val().trim();
+    $('#player-name').val('');
+  })
+
+  $(document).ready(function(){
+    $('.collapsible').collapsible();
+    login();
+  });
+
+  function login() {
+    $('#intro-modal, #new-fish-modal').modal({
+      dismissible: false
+    });
+    $('#intro-modal').modal('open');
+    $('#exist-fish').on('click', function() {
+      return;
+    });
+    $('#new-fish').on('click', function() {
+      $('#new-fish-modal').modal('open');
+    });
+    $('#submit-fish-name').on('click', function(event) {
+      event.preventDefault();
+      var tmp = $('#record-name').val().trim();
+      if ( tmp == '') {}
+      else {      
+        $('#new-fish-modal').modal('close');
+        playerName = $('#record-name').val().trim();
+      }
+    });
+  }
+
   var database = firebase.database();
+
   var map = null;
+<<<<<<< HEAD
   var timerOn=false;
+=======
+  var playerName = '';
+>>>>>>> 0a252a08d0f127bf912cc56b8ca953cfe8696209
   var icons = {
           level0: {
             icon: 'assets/images/fish-level-0.png'            
@@ -31,44 +69,62 @@
         };
   
   function initMap() {
+    var myName = "Iris";
     var uluru = {lat: -25.363, lng: 131.044};
     map = new google.maps.Map(document.getElementById('map'), {
       zoom: 4,
       center: uluru
-    });
-    var marker = new google.maps.Marker({
-      position: uluru,
-      icon: icons.level0.icon,
-      map: map
     });
 
     google.maps.event.addListener(map, 'click', function(event) {
       var latLng = event.latLng;
       var latitude = latLng.lat();
       var longitude = latLng.lng();
-      saveAddedMarker(latitude, longitude);
+      saveAddedMarker(latitude, longitude, myName, 0);
     });
 
-    database.ref().on("value", function(snapshot) {
+    database.ref('fish/').on("value", function(snapshot) {
       console.log(snapshot.val());
     });
-    database.ref().on("child_added", function(childSnapshot) {
-        placeMarker(childSnapshot.val().lat, childSnapshot.val().lng);
+    database.ref('fish/').on("child_added", function(childSnapshot) {
+        var childSnapshotVal = childSnapshot.val();
+        placeMarker(childSnapshotVal.lat, childSnapshotVal.lng, childSnapshotVal.name, childSnapshotVal.level);
     }, function(errorObject) {
         console.log('Errors handled: ' + errorObject.code);
     });
   }
 
-  function saveAddedMarker(latitude, longitude) {
-    database.ref().push({lat: latitude, lng: longitude});
+  function saveAddedMarker(latitude, longitude, name, level) {
+    database.ref('fish/').push({lat: latitude, lng: longitude, name: name, level: level});
   }
-
-  function placeMarker(latitude, longitude) {
+  function placeMarker(latitude, longitude, name, level) {
     var markerLocation = {lat: latitude, lng: longitude};
     var marker = new google.maps.Marker({
       position: markerLocation,
+<<<<<<< HEAD
       icon: levelImg(level),
       map: map
+=======
+      map: map,
+      icon: icons.level0.icon,
+      customInfo: {name, level}
+    });
+    // google.maps.event.addDomListener(window, 'load', initialize);
+    google.maps.event.addDomListener(marker, 'click', function(e) {
+      alert("clicked marker");
+    });
+    google.maps.event.addDomListener(marker, 'mouseover', function(e) {
+      $("#fish-pin-name").text(this.customInfo.name);
+      $("#fish-pin-level").text(this.customInfo.level);
+      $("#fish-pin-lat").text(this.position.lat());
+      $("#fish-pin-lng").text(this.position.lng());
+    });
+    google.maps.event.addDomListener(marker, 'mouseout', function(e) {
+      $("#fish-pin-name").text("");
+      $("#fish-pin-level").text("");
+      $("#fish-pin-lat").text("");
+      $("#fish-pin-lng").text("");
+>>>>>>> 0a252a08d0f127bf912cc56b8ca953cfe8696209
     });
   }
 
@@ -90,19 +146,17 @@
     timerOn = false;  
   }
 
-  function startTimer() {  
+  function generateRandomLatLngCPUFish() {
     if (!timerOn) {
         timerOn = true;
+        intervalId = setInterval(decrement, 1000);
         getLatLng();
     }
-  }
-
-  function generateRandomLatLngCPUFish() {
-    startTimer();
+    
   }
 
   function getLatLng() {
-    t = setTimeout(displayTime, 180000);
+    
     var randonLng = 0, randomLat = 0;
     for (var i = 0; i < randomCount; i++) {
       //get random lat/lng
