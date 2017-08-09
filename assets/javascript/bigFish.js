@@ -9,14 +9,17 @@
   };
   firebase.initializeApp(config);
 
+  // Records new fish name created by player
   $("#create-fish").on('click', function() {
     event.preventDefault();
     playerName = $('#player-name').val().trim();
     $('#player-name').val('');
   });
 
+  // Enables bottom collapsible
   $(document).ready(function(){
-    $('.collapsible').collapsible();
+    $('.collapsible').collapsible('open', 0);
+
   });
 
   var database = firebase.database();
@@ -67,14 +70,6 @@
       } 
     });
 
-    // Should be obsolete now
-    /*google.maps.event.addListener(map, 'click', function(event) {
-      var latLng = event.latLng;
-      var latitude = latLng.lat();
-      var longitude = latLng.lng();
-      saveAddedMarker(latitude, longitude, myName, 0);
-    });*/
-
     database.ref('fish/').on("value", function(snapshot) {
       console.log(snapshot.val());
     });
@@ -86,6 +81,7 @@
     });
   }
 
+  // Prompts user with login menu
   function login() {
     $('#intro-modal, #new-fish-modal').modal({
       dismissible: false
@@ -109,10 +105,11 @@
     });
   }
 
+  // Loads player fish onto screen
   function loadPlayer() {
     var tmpName = localStorage.getItem("name");
-    var tmpLat = localStorage.getItem("latitude");
-    var tmpLong = localStorage.getItem("longitude");
+    var tmpLat = parseInt(localStorage.getItem("latitude"));
+    var tmpLong = parseInt(localStorage.getItem("longitude"));
     var tmpLvl = localStorage.getItem("level");
     placeMarker(tmpLat, tmpLong, tmpName, tmpLvl);
   }
