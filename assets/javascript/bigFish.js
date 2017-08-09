@@ -13,37 +13,14 @@
     event.preventDefault();
     playerName = $('#player-name').val().trim();
     $('#player-name').val('');
-  })
+  });
 
   $(document).ready(function(){
     $('.collapsible').collapsible();
-    login();
   });
 
-  function login() {
-    $('#intro-modal, #new-fish-modal').modal({
-      dismissible: false
-    });
-    $('#intro-modal').modal('open');
-    $('#exist-fish').on('click', function() {
-      return;
-    });
-    $('#new-fish').on('click', function() {
-      $('#new-fish-modal').modal('open');
-    });
-    $('#submit-fish-name').on('click', function(event) {
-      event.preventDefault();
-      var tmp = $('#record-name').val().trim();
-      if ( tmp == '') {}
-      else {      
-        $('#new-fish-modal').modal('close');
-        playerName = $('#record-name').val().trim();
-      }
-    });
-  }
-
   var database = firebase.database();
-
+  var setStart = true;
   var map = null;
   var playerName = '';
   var icons = {
@@ -72,12 +49,31 @@
       center: uluru
     });
 
+    login();
+
+    // Player initial position select
     google.maps.event.addListener(map, 'click', function(event) {
+      if (setStart) {
+        var latLng = event.latLng;
+        var latitude = latLng.lat();
+        var longitude = latLng.lng();
+        // saveAddedMarker(latitude, longitude, playerName, 0);
+        setStart = false;
+        placeMarker(latitude, longitude, playerName, 0);
+        localStorage.setItem("name", playerName);
+        localStorage.setItem("latitude", latitude);
+        localStorage.setItem("longitude", longitude);
+        localStorage.setItem("level", 0);
+      } 
+    });
+
+    // Should be obsolete now
+    /*google.maps.event.addListener(map, 'click', function(event) {
       var latLng = event.latLng;
       var latitude = latLng.lat();
       var longitude = latLng.lng();
       saveAddedMarker(latitude, longitude, myName, 0);
-    });
+    });*/
 
     database.ref('fish/').on("value", function(snapshot) {
       console.log(snapshot.val());
@@ -88,6 +84,37 @@
     }, function(errorObject) {
         console.log('Errors handled: ' + errorObject.code);
     });
+  }
+
+  function login() {
+    $('#intro-modal, #new-fish-modal').modal({
+      dismissible: false
+    });
+    $('#intro-modal').modal('open');
+    $('#exist-fish').on('click', function() {
+      setStart = false;
+      loadPlayer();
+    });
+    $('#new-fish').on('click', function() {
+      $('#new-fish-modal').modal('open');
+      localStorage.clear();
+    });
+    $('#submit-fish-name').on('click', function(event) {
+      event.preventDefault();
+      var tmp = $('#record-name').val().trim();
+      if ( tmp !== '') {
+        $('#new-fish-modal').modal('close');
+        playerName = $('#record-name').val().trim();
+      }
+    });
+  }
+
+  function loadPlayer() {
+    var tmpName = localStorage.getItem("name");
+    var tmpLat = localStorage.getItem("latitude");
+    var tmpLong = localStorage.getItem("longitude");
+    var tmpLvl = localStorage.getItem("level");
+    placeMarker(tmpLat, tmpLong, tmpName, tmpLvl);
   }
 
   function saveAddedMarker(latitude, longitude, name, level) {
