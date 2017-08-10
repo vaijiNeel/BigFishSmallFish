@@ -23,9 +23,8 @@
   });
 
   var database = firebase.database();
-  var setStart = true;
   var map = null;
-  var timerOn=false;
+  var timerOn= false;
   var playerName = '';
   var icons = {
           level0: {
@@ -52,22 +51,24 @@
       zoom: 4,
       center: uluru
     });
-
-    login();
+    console.log(localStorage.getItem('name'));
+    if (localStorage.getItem('name') == null ) {
+      login();
+    } else {loadPlayer();}
+    
 
     // Player initial position select
     google.maps.event.addListener(map, 'click', function(event) {
-      if (setStart) {
+      if (localStorage.getItem('name') == null) {
         var latLng = event.latLng;
         var latitude = latLng.lat();
         var longitude = latLng.lng();
         // saveAddedMarker(latitude, longitude, playerName, 0);
-        setStart = false;
-        placeMarker(latitude, longitude, playerName, 0);
+        placeMarker(latitude, longitude, playerName, 1);
         localStorage.setItem("name", playerName);
         localStorage.setItem("latitude", latitude);
         localStorage.setItem("longitude", longitude);
-        localStorage.setItem("level", 0);
+        localStorage.setItem("level", 1);
       } 
     });
 
@@ -84,13 +85,13 @@
 
   // Prompts user with login menu
   function login() {
-    $('#intro-modal, #new-fish-modal').modal({
+    $('#intro-modal, #new-fish-modal, #username-modal').modal({
       dismissible: false
     });
     $('#intro-modal').modal('open');
-    $('#exist-fish').on('click', function() {
-      setStart = false;
-      loadPlayer();
+    $('#exist-fish').on('click', function(event) {
+      event.preventDefault();
+      $('#username-modal').modal('open');
     });
     $('#new-fish').on('click', function() {
       $('#new-fish-modal').modal('open');
@@ -100,10 +101,15 @@
       event.preventDefault();
       var tmp = $('#record-name').val().trim();
       if ( tmp !== '') {
-        $('#new-fish-modal').modal('close');
         playerName = $('#record-name').val().trim();
+        $('#new-fish-modal').modal('close');
       }
     });
+    $('#find-fish-name').on('click', function(event) {
+      event.preventDefault();
+      var tmp = $('#find-name').val().trim();
+      // needs to check if entered username is in the firebase database
+    })
   }
 
   // Loads player fish onto screen
@@ -118,6 +124,7 @@
   function saveAddedMarker(latitude, longitude, name, level) {
     database.ref('fish/').push({lat: latitude, lng: longitude, name: name, level: level});
   }
+
   function placeMarker(latitude, longitude, name, level) {
     var markerLocation = {lat: latitude, lng: longitude};
     var marker = new google.maps.Marker({
