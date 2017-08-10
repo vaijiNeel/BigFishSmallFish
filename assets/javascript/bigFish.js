@@ -61,9 +61,8 @@
         var latLng = event.latLng;
         var latitude = latLng.lat();
         var longitude = latLng.lng();
-        // saveAddedMarker(latitude, longitude, playerName, 0);
+        addMarker(latitude, longitude, playerName, 0);
         setStart = false;
-        placeMarker(latitude, longitude, playerName, 0);
         localStorage.setItem("name", playerName);
         localStorage.setItem("latitude", latitude);
         localStorage.setItem("longitude", longitude);
@@ -74,9 +73,11 @@
     database.ref('fish/').on("value", function(snapshot) {
       console.log(snapshot.val());
     });
+
+    // Whenever a fish gets added to the database, then it gets displayed on the frontend, too.
     database.ref('fish/').on("child_added", function(childSnapshot) {
         var childSnapshotVal = childSnapshot.val();
-        placeMarker(childSnapshotVal.lat, childSnapshotVal.lng, childSnapshotVal.name, childSnapshotVal.level);
+        showMarkerOnFrontend(childSnapshotVal.lat, childSnapshotVal.lng, childSnapshotVal.name, childSnapshotVal.level);
     }, function(errorObject) {
         console.log('Errors handled: ' + errorObject.code);
     });
@@ -112,13 +113,21 @@
     var tmpLat = parseInt(localStorage.getItem("latitude"));
     var tmpLong = parseInt(localStorage.getItem("longitude"));
     var tmpLvl = localStorage.getItem("level");
-    placeMarker(tmpLat, tmpLong, tmpName, tmpLvl);
+    showMarkerOnFrontend(tmpLat, tmpLong, tmpName, tmpLvl);
   }
 
-  function saveAddedMarker(latitude, longitude, name, level) {
+  /**
+  * Adds a new marker. Saves the marker to the database.
+  */
+  function addMarker(latitude, longitude, name, level) {
     database.ref('fish/').push({lat: latitude, lng: longitude, name: name, level: level});
   }
-  function placeMarker(latitude, longitude, name, level) {
+
+  /**
+  * Displays a marker on the map, given the marker data. To add a new marker, use the addMarker() function.
+  * This function only accounts for getting a marker to display on the frontend, NOT for adding a marker to the database.
+  */
+  function showMarkerOnFrontend(latitude, longitude, name, level) {
     var markerLocation = {lat: latitude, lng: longitude};
     var marker = new google.maps.Marker({
       position: markerLocation,
@@ -126,7 +135,7 @@
       map: map,     
       customInfo: {name, level}
     });
-    // google.maps.event.addDomListener(window, 'load', initialize);
+
     google.maps.event.addDomListener(marker, 'click', function(e) {
       alert("clicked marker");
     });
