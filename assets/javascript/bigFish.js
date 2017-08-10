@@ -23,9 +23,8 @@
   });
 
   var database = firebase.database();
-  var setStart = true;
   var map = null;
-  var timerOn=false;
+  var timerOn= false;
   var playerName = '';
   var icons = {
           level0: {
@@ -52,22 +51,24 @@
       zoom: 4,
       center: uluru
     });
-
-    login();
+    console.log(localStorage.getItem('name'));
+    if (localStorage.getItem('name') == null ) {
+      login();
+    } else {loadPlayer();}
+    
 
     // Player initial position select
     google.maps.event.addListener(map, 'click', function(event) {
-      if (setStart) {
+      if (localStorage.getItem('name') == null) {
         var latLng = event.latLng;
         var latitude = latLng.lat();
         var longitude = latLng.lng();
         // saveAddedMarker(latitude, longitude, playerName, 0);
-        setStart = false;
-        placeMarker(latitude, longitude, playerName, 0);
+        placeMarker(latitude, longitude, playerName, 1);
         localStorage.setItem("name", playerName);
         localStorage.setItem("latitude", latitude);
         localStorage.setItem("longitude", longitude);
-        localStorage.setItem("level", 0);
+        localStorage.setItem("level", 1);
       } 
     });
 
@@ -118,6 +119,7 @@
   function saveAddedMarker(latitude, longitude, name, level) {
     database.ref('fish/').push({lat: latitude, lng: longitude, name: name, level: level});
   }
+
   function placeMarker(latitude, longitude, name, level) {
     var markerLocation = {lat: latitude, lng: longitude};
     var marker = new google.maps.Marker({
