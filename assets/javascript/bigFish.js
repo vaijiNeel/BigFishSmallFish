@@ -85,13 +85,13 @@
 
   // Prompts user with login menu
   function login() {
-    $('#intro-modal, #new-fish-modal').modal({
+    $('#intro-modal, #new-fish-modal, #username-modal').modal({
       dismissible: false
     });
     $('#intro-modal').modal('open');
-    $('#exist-fish').on('click', function() {
-      setStart = false;
-      loadPlayer();
+    $('#exist-fish').on('click', function(event) {
+      event.preventDefault();
+      $('#username-modal').modal('open');
     });
     $('#new-fish').on('click', function() {
       $('#new-fish-modal').modal('open');
@@ -101,10 +101,16 @@
       event.preventDefault();
       var tmp = $('#record-name').val().trim();
       if ( tmp !== '') {
-        $('#new-fish-modal').modal('close');
         playerName = $('#record-name').val().trim();
+        $('#new-fish-modal').modal('close');
       }
     });
+    $('#find-fish-name').on('click', function(event) {
+      event.preventDefault();
+      var tmp = $('#find-name').val().trim();
+      // needs to check if entered username is in the firebase database
+      }
+    })
   }
 
   // Loads player fish onto screen
