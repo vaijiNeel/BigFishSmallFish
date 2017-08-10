@@ -109,7 +109,6 @@
       event.preventDefault();
       var tmp = $('#find-name').val().trim();
       // needs to check if entered username is in the firebase database
-      }
     })
   }
 
