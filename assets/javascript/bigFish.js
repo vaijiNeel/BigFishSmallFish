@@ -18,6 +18,9 @@
   $(document).ready(function(){
     $('.collapsible').collapsible();
     login();
+    for (var i = 0; i < 50; i++) {
+      getLatLng();
+    }    
   });
 
   function login() {
@@ -45,7 +48,7 @@
   var database = firebase.database();
 
   var map = null;
-  var timerOn=false;
+  var timerOn=false, counter=1;
   var playerName = '';
   var icons = {
           level0: {
@@ -77,7 +80,7 @@
       var latLng = event.latLng;
       var latitude = latLng.lat();
       var longitude = latLng.lng();
-      saveAddedMarker(latitude, longitude, myName, 0);
+      saveAddedMarker(latitude, longitude, myName, 1);
     });
 
     database.ref('fish/').on("value", function(snapshot) {
@@ -94,6 +97,7 @@
   function saveAddedMarker(latitude, longitude, name, level) {
     database.ref('fish/').push({lat: latitude, lng: longitude, name: name, level: level});
   }
+
   function placeMarker(latitude, longitude, name, level) {
     var markerLocation = {lat: latitude, lng: longitude};
     var marker = new google.maps.Marker({
@@ -140,21 +144,46 @@
 
   function generateRandomLatLngCPUFish() {
     if (!timerOn) {
-        timerOn = true;
-        intervalId = setInterval(decrement, 1000);
-        getLatLng();
-    }
-    
+      timerOn = true;
+      t = setInterval(getLatLng, 1000);
+      getLatLng();
+    }    
   }
 
-  function getLatLng() {
-    
-    var randonLng = 0, randomLat = 0;
-    for (var i = 0; i < randomCount; i++) {
-      //get random lat/lng
-      randomLat = generateRandomLatLng(90, -90, 3);
-      randomLng = generateRandomLatLng(180, -180, 3);      
-    }
+  function getLatLng() {    
+    var randonLng = 0, randomLat = 0, data_name="cpuFish", cpuFishLevel = 0;
+    //get random lat/lng
+    data_name = data_name + counter;
+    randomLat = generateRandomLatLng(85, -85, 3);
+    randomLng = generateRandomLatLng(180, -180, 3); 
+    console.log("lat - " + randomLat);
+    console.log("lng - " + randomLng);
+    //-------------------testing------------
+    datasnapshot = new DataSnapshot(database);
+
+  //  database rootRef = FirebaseDatabase.getInstance().getReference();
+    // rootRef.addListenerForSingleValueEvent(new ValueEventListener() {
+    //   // @Override
+    //   void onDataChange(DataSnapshot snapshot) {
+    //     if (snapshot.hasChild("name")) 
+    //       console.log("Name already exists.");
+    //     else
+    //       console.log("Name doesn't exist.");
+    //   }
+    // });
+    // var nameToCheck = "cpuFish1";
+    // var nameRef = new firebase(name);
+    // nameRef.child(name).once('value', function(snapshot) {
+    //   var exists = (snapshot.val() !== null);
+    //   if(exists)
+    //     console.log("Name already exists.");
+    //   else
+    //     console.log("Name doesn't exist.");
+    // });
+
+    //---------------testing-----------
+    saveAddedMarker(randomLat, randomLng, data_name, cpuFishLevel);
+    counter++;
   }
 
   function generateRandomLatLng(to, from, fixed) {
