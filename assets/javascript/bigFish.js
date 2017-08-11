@@ -9,44 +9,20 @@
   };
   firebase.initializeApp(config);
 
+  // Records new fish name created by player
   $("#create-fish").on('click', function() {
     event.preventDefault();
     playerName = $('#player-name').val().trim();
     $('#player-name').val('');
-  })
-
-  $(document).ready(function(){
-    $('.collapsible').collapsible();
-    login();
-    for (var i = 0; i < 50; i++) {
-      getLatLng();
-    }    
   });
 
-  function login() {
-    $('#intro-modal, #new-fish-modal').modal({
-      dismissible: false
-    });
-    $('#intro-modal').modal('open');
-    $('#exist-fish').on('click', function() {
-      return;
-    });
-    $('#new-fish').on('click', function() {
-      $('#new-fish-modal').modal('open');
-    });
-    $('#submit-fish-name').on('click', function(event) {
-      event.preventDefault();
-      var tmp = $('#record-name').val().trim();
-      if ( tmp == '') {}
-      else {      
-        $('#new-fish-modal').modal('close');
-        playerName = $('#record-name').val().trim();
-      }
-    });
-  }
+  // Enables bottom collapsible
+  $(document).ready(function(){      
+    generateRandomLatLngCPUFish();
+    $('.collapsible').collapsible('open', 0);
+  });
 
   var database = firebase.database();
-
   var map = null;
   var timerOn=false, counter=1;
   var playerName = '';
@@ -75,30 +51,91 @@
       zoom: 4,
       center: uluru
     });
+    console.log(localStorage.getItem('name'));
+    if (localStorage.getItem('name') == null ) {
+      login();
+    } else {loadPlayer();}    
 
+    // Player initial position select
     google.maps.event.addListener(map, 'click', function(event) {
-      var latLng = event.latLng;
-      var latitude = latLng.lat();
-      var longitude = latLng.lng();
-      saveAddedMarker(latitude, longitude, myName, 1);
+      
+      if (localStorage.getItem('name') == null) {
+        var latLng = event.latLng;
+        var latitude = latLng.lat();
+        var longitude = latLng.lng();
+
+        addMarker(latitude, longitude, playerName, 1);
+
+        localStorage.setItem("name", playerName);
+        localStorage.setItem("latitude", latitude);
+        localStorage.setItem("longitude", longitude);
+        localStorage.setItem("level", 1);
+      } 
     });
 
     database.ref('fish/').on("value", function(snapshot) {
       console.log(snapshot.val());
     });
+
+    // Whenever a fish gets added to the database, then it gets displayed on the frontend, too.
     database.ref('fish/').on("child_added", function(childSnapshot) {
         var childSnapshotVal = childSnapshot.val();
-        placeMarker(childSnapshotVal.lat, childSnapshotVal.lng, childSnapshotVal.name, childSnapshotVal.level);
+        showMarkerOnFrontend(childSnapshotVal.lat, childSnapshotVal.lng, childSnapshotVal.name, childSnapshotVal.level);
     }, function(errorObject) {
         console.log('Errors handled: ' + errorObject.code);
     });
   }
 
-  function saveAddedMarker(latitude, longitude, name, level) {
+  // Prompts user with login menu
+  function login() {
+    $('#intro-modal, #new-fish-modal, #username-modal').modal({
+      dismissible: false
+    });
+    $('#intro-modal').modal('open');
+    $('#exist-fish').on('click', function(event) {
+      event.preventDefault();
+      $('#username-modal').modal('open');
+    });
+    $('#new-fish').on('click', function() {
+      $('#new-fish-modal').modal('open');
+      localStorage.clear();
+    });
+    $('#submit-fish-name').on('click', function(event) {
+      event.preventDefault();
+      var tmp = $('#record-name').val().trim();
+      if ( tmp !== '') {
+        playerName = $('#record-name').val().trim();
+        $('#new-fish-modal').modal('close');
+      }
+    });
+    $('#find-fish-name').on('click', function(event) {
+      event.preventDefault();
+      var tmp = $('#find-name').val().trim();
+      // needs to check if entered username is in the firebase database
+    })
+  }
+
+  // Loads player fish onto screen
+  function loadPlayer() {
+    var tmpName = localStorage.getItem("name");
+    var tmpLat = parseInt(localStorage.getItem("latitude"));
+    var tmpLong = parseInt(localStorage.getItem("longitude"));
+    var tmpLvl = localStorage.getItem("level");
+    showMarkerOnFrontend(tmpLat, tmpLong, tmpName, tmpLvl);
+  }
+
+  /**
+  * Adds a new marker. Saves the marker to the database.
+  */
+  function addMarker(latitude, longitude, name, level) {
     database.ref('fish/').push({lat: latitude, lng: longitude, name: name, level: level});
   }
 
-  function placeMarker(latitude, longitude, name, level) {
+  /**
+  * Displays a marker on the map, given the marker data. To add a new marker, use the addMarker() function.
+  * This function only accounts for getting a marker to display on the frontend, NOT for adding a marker to the database.
+  */
+  function showMarkerOnFrontend(latitude, longitude, name, level) {
     var markerLocation = {lat: latitude, lng: longitude};
     var marker = new google.maps.Marker({
       position: markerLocation,
@@ -106,7 +143,7 @@
       map: map,     
       customInfo: {name, level}
     });
-    // google.maps.event.addDomListener(window, 'load', initialize);
+
     google.maps.event.addDomListener(marker, 'click', function(e) {
       alert("clicked marker");
     });
@@ -143,49 +180,25 @@
   }
 
   function generateRandomLatLngCPUFish() {
-    if (!timerOn) {
-      timerOn = true;
-      t = setInterval(getLatLng, 1000);
+    for (var i = 0; i < 50; i++) {
       getLatLng();
-    }    
+    }  
+    
   }
 
   function getLatLng() {    
     var randonLng = 0, randomLat = 0, data_name="cpuFish", cpuFishLevel = 0;
     //get random lat/lng
     data_name = data_name + counter;
-    randomLat = generateRandomLatLng(85, -85, 3);
-    randomLng = generateRandomLatLng(180, -180, 3); 
+    randomLat = generateRandomLatLng(-85, 85, 3);
+    randomLng = generateRandomLatLng(-180, 180, 3); 
     console.log("lat - " + randomLat);
     console.log("lng - " + randomLng);
-    //-------------------testing------------
-    datasnapshot = new DataSnapshot(database);
-
-  //  database rootRef = FirebaseDatabase.getInstance().getReference();
-    // rootRef.addListenerForSingleValueEvent(new ValueEventListener() {
-    //   // @Override
-    //   void onDataChange(DataSnapshot snapshot) {
-    //     if (snapshot.hasChild("name")) 
-    //       console.log("Name already exists.");
-    //     else
-    //       console.log("Name doesn't exist.");
-    //   }
-    // });
-    // var nameToCheck = "cpuFish1";
-    // var nameRef = new firebase(name);
-    // nameRef.child(name).once('value', function(snapshot) {
-    //   var exists = (snapshot.val() !== null);
-    //   if(exists)
-    //     console.log("Name already exists.");
-    //   else
-    //     console.log("Name doesn't exist.");
-    // });
-
-    //---------------testing-----------
-    saveAddedMarker(randomLat, randomLng, data_name, cpuFishLevel);
+    
+    addMarker(randomLat, randomLng, data_name, cpuFishLevel);
     counter++;
   }
 
-  function generateRandomLatLng(to, from, fixed) {
+  function generateRandomLatLng(from, to, fixed) {
     return ( (Math.random() * (to - from) + from).toFixed(fixed) * 1 );
   }
