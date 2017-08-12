@@ -8,6 +8,7 @@
     messagingSenderId: "542377547666"
   };
   firebase.initializeApp(config);
+  var database = firebase.database();
 
   // Records new fish name created by player
   $("#create-fish").on('click', function() {
@@ -22,28 +23,28 @@
     $('.collapsible').collapsible('open', 0);
   });
 
-  var database = firebase.database();
   var map = null;
   var playerName = '';
+  var myKey = null;
 
   var counter=1;
   var icons = {
-          level0: {
-            icon: 'assets/images/fish-level-0.png'            
-          },
-          level1: {
-            icon: 'assets/images/fish-level-1.png'
-          },
-          level2: {
-            icon: 'assets/images/fish-level-2.png'
-          },
-          level3: {
-            icon: 'assets/images/fish-level-3.png'
-          },
-          level4: {
-            icon: 'assets/images/fish-level-4.png'
-          }
-        };
+    level0: {
+      icon: 'assets/images/fish-level-0.png'            
+    },
+    level1: {
+      icon: 'assets/images/fish-level-1.png'
+    },
+    level2: {
+      icon: 'assets/images/fish-level-2.png'
+    },
+    level3: {
+      icon: 'assets/images/fish-level-3.png'
+    },
+    level4: {
+      icon: 'assets/images/fish-level-4.png'
+    }
+  };
   
   function initMap() {
     var myName = "Iris";
@@ -59,8 +60,8 @@
 
     // Player initial position select
     google.maps.event.addListener(map, 'click', function(event) {
-      
-      if (localStorage.getItem('name') == null) {
+
+      // if (localStorage.getItem('name') == null) {
         var latLng = event.latLng;
         var latitude = latLng.lat();
         var longitude = latLng.lng();
@@ -71,7 +72,7 @@
         localStorage.setItem("latitude", latitude);
         localStorage.setItem("longitude", longitude);
         localStorage.setItem("level", 1);
-      } 
+      // } 
     });
 
     database.ref('fish/').on("value", function(snapshot) {
@@ -80,10 +81,11 @@
 
     // Whenever a fish gets added to the database, then it gets displayed on the frontend, too.
     database.ref('fish/').on("child_added", function(childSnapshot) {
-        var childSnapshotVal = childSnapshot.val();
-        showMarkerOnFrontend(childSnapshotVal.lat, childSnapshotVal.lng, childSnapshotVal.name, childSnapshotVal.level);
+      var childSnapshotVal = childSnapshot.val();
+      var markerKey = childSnapshot.key;
+      showMarkerOnFrontend(childSnapshotVal.lat, childSnapshotVal.lng, childSnapshotVal.name, childSnapshotVal.level, childSnapshot);
     }, function(errorObject) {
-        console.log('Errors handled: ' + errorObject.code);
+      console.log('Errors handled: ' + errorObject.code);
     });
   }
 
@@ -122,32 +124,68 @@
     var tmpLat = parseInt(localStorage.getItem("latitude"));
     var tmpLong = parseInt(localStorage.getItem("longitude"));
     var tmpLvl = localStorage.getItem("level");
-    showMarkerOnFrontend(tmpLat, tmpLong, tmpName, tmpLvl);
+    myKey = localStorage.getItem("myKey");
+    // addMarker(tmpLat, tmpLong, tmpName, tmpLvl);
   }
 
   /**
   * Adds a new marker. Saves the marker to the database.
   */
   function addMarker(latitude, longitude, name, level) {
-    database.ref('fish/').push({lat: latitude, lng: longitude, name: name, level: level});
+    var justAddedUserMarker = database.ref('fish/').push({lat: latitude, lng: longitude, name: name, level: level});
+    console.log(justAddedUserMarker);
+    var myKey = justAddedUserMarker.key;
+    localStorage.setItem("myKey", myKey);
+    myKey = myKey;
   }
 
   /**
   * Displays a marker on the map, given the marker data. To add a new marker, use the addMarker() function.
   * This function only accounts for getting a marker to display on the frontend, NOT for adding a marker to the database.
   */
-  function showMarkerOnFrontend(latitude, longitude, name, level) {
+  function showMarkerOnFrontend(latitude, longitude, name, level, dataSnapshot) {
     var markerLocation = {lat: latitude, lng: longitude};
     var marker = new google.maps.Marker({
       position: markerLocation,
       icon: levelImg(level),   
       map: map,     
-      customInfo: {name, level}
+      customInfo: {"name": name, "level": level, "key": dataSnapshot.key}
     });
 
     google.maps.event.addDomListener(marker, 'click', function(e) {
-      alert("clicked marker");
+      // Eating of other fish occurs here.
+      var myFishKey = localStorage.getItem("myKey");
+      alert(myFishKey);
+      debugger;
+      console.log(e);
+      var targetFishKey = this.customInfo.key;
+      if(myFishKey !== targetFishKey) {
+        var targetFish = database.ref("fish").child(targetFishKey);
+        var myFish = database.ref("fish").child(myFishKey);
+        var targetLat = null;
+        var targetLng = null;
+        var targetLevel = null;
+        var myLevel = null;
+        targetFish.once("value", function(snapshot) {
+          debugger;
+          targetLat = snapshot.val().lat;
+          targetLng = snapshot.val().lng;
+          targetLevel = snapshot.val().level;
+          myLevel = localStorage.getItem("level");
+          debugger;
+          if(myLevel !== null && targetLevel !== null && targetLat !== null && targetLng !== null) {
+            debugger;
+            if(myLevel > targetLevel) {
+              targetFish.remove();
+              // TODO update user fish here.
+              debugger;
+              updateFish(targetLat, targetLng, localStorage.getItem("level"));
+            }
+          }
+        });
+      }
     });
+
     google.maps.event.addDomListener(marker, 'mouseover', function(e) {
       $("#fish-pin-name").text(this.customInfo.name);
       $("#fish-pin-level").text(this.customInfo.level);
@@ -162,6 +200,14 @@
     });
   }
 
+  function updateFish(updatedLat, updatedLng, currentLevel) {
+    // TODO implement.
+    debugger;
+    var fishKey = localStorage.getItem("myKey");
+    var fishRef = database.ref("fish").child(fishKey);
+    var upgradeLevel = parseInt(currentLevel) + 1;
+    fishRef.update({"level": upgradeLevel, "lat": updatedLat, "lng": updatedLng});
+  }
 
   function levelImg(level) {
     if(level<=0)
