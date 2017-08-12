@@ -8,6 +8,9 @@
 	<!-- Compiled and minified CSS -->
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.1/css/materialize.min.css">
 
+	<!-- Animate.css -->
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.min.css" integrity="sha384-OHBBOqpYHNsIqQy8hL1U+8OXf9hH6QRxi0+EODezv82DfnZoV7qoHAZDwMwEJvSw" crossorigin="anonymous">
+
 	<!-- Link to css files -->
 	<link rel="stylesheet" type="text/css" href="assets/css/reset.css">	
 	<link rel="stylesheet" type="text/css" href="assets/css/style.css">	
@@ -48,6 +51,7 @@
 					What is your fish's name<br>
 					<input type="text" name="username" id='find-name'><br>
 					<input type="submit" value="Submit" id="find-fish-name">
+					<input type="submit" value="Back" id="back-btn">
 				</form>
 			</div>
 		</div>
@@ -66,6 +70,7 @@
 				<li>
 					<div class="collapsible-header info-header">Fish Info</div>
 					<div class="collapsible-body">
+						<img id="player-fish" src="assets/images/fish-level-0.png">
 						<section>
 					        <table>
 					          <tr>

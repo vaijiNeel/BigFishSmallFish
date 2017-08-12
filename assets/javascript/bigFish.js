@@ -100,6 +100,12 @@
       $('#new-fish-modal').modal('open');
       localStorage.clear();
     });
+    $('#back-btn').on('click', function(event) {
+      event.preventDefault();
+      $('#find-name').val('');
+      $('#username-modal').modal('close');
+      $('#intro-modal').modal('open');
+    });
     $('#submit-fish-name').on('click', function(event) {
       event.preventDefault();
       var tmp = $('#record-name').val().trim();
@@ -146,6 +152,7 @@
 
     google.maps.event.addDomListener(marker, 'click', function(e) {
       alert("clicked marker");
+      
     });
     google.maps.event.addDomListener(marker, 'mouseover', function(e) {
       $("#fish-pin-name").text(this.customInfo.name);
