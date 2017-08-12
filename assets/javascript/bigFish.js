@@ -17,15 +17,16 @@
   });
 
   // Enables bottom collapsible
-  $(document).ready(function(){
+  $(document).ready(function(){      
+    generateRandomLatLngCPUFish();
     $('.collapsible').collapsible('open', 0);
-
   });
 
   var database = firebase.database();
   var map = null;
-  var timerOn= false;
   var playerName = '';
+
+  var counter=1;
   var icons = {
           level0: {
             icon: 'assets/images/fish-level-0.png'            
@@ -54,11 +55,11 @@
     console.log(localStorage.getItem('name'));
     if (localStorage.getItem('name') == null ) {
       login();
-    } else {loadPlayer();}
-    
+    } else {loadPlayer();}    
 
     // Player initial position select
     google.maps.event.addListener(map, 'click', function(event) {
+      
       if (localStorage.getItem('name') == null) {
         var latLng = event.latLng;
         var latitude = latLng.lat();
@@ -168,43 +169,48 @@
     });
   }
 
-  function levelImg(level) {
-    if(level<=10)
-      return icons.level0.icon;
-    else if(level>10 && level<=20)
-      return icons.level1.icon;
-    else if(level>20 && level<=30)
-      return icons.level2.icon;
-    else if(level>30 && level<=40)
-      return icons.level3.icon;
-    else if(level>40)
-      return icons.level4.icon;
+function levelImg(level) {
+  if(level==0)
+    return icons.level0.icon;
+  else if(level<=10)
+    return icons.level1.icon;
+  else if(level>10 && level<=20)
+    return icons.level2.icon;
+  else if(level>20 && level<=30)
+    return icons.level3.icon;
+  else if(level>30)
+    return icons.level4.icon;
+}
+
+  //centers the map at clicked marker. 
+  function centerMapAtMarker(marker) {
+    //if you need animation use panTo, else use setCenter    
+    // map.setCenter(marker.getPosition());
+    map.panTo(marker.getPosition());
   }
 
-  function stopTimer() {
-    clearTimeout(t);
-    timerOn = false;  
-  }
+  // function emptyCPUFish(){
+  //   database.ref('fish/').remove();
+  // }
 
   function generateRandomLatLngCPUFish() {
-    if (!timerOn) {
-        timerOn = true;
-        intervalId = setInterval(decrement, 1000);
-        getLatLng();
-    }
-    
+    counter=1;
+    // getLatLng();
+    setInterval(getLatLng, 30*1000);
   }
 
-  function getLatLng() {
-    
-    var randonLng = 0, randomLat = 0;
-    for (var i = 0; i < randomCount; i++) {
-      //get random lat/lng
-      randomLat = generateRandomLatLng(90, -90, 3);
-      randomLng = generateRandomLatLng(180, -180, 3);      
-    }
+  function getLatLng() {    
+    var randonLng = 0, randomLat = 0, data_name="cpuFish", cpuFishLevel = 0;
+    //get random lat/lng
+    data_name = data_name + counter;
+    randomLat = generateRandomLatLng(-85, 85, 3);
+    randomLng = generateRandomLatLng(-180, 180, 3);      
+    addMarker(randomLat, randomLng, data_name, cpuFishLevel);
+    counter++;
+    // console.log("lat - " + randomLat);
+    // console.log("lng - " + randomLng);   
   }
 
-  function generateRandomLatLng(to, from, fixed) {
+  function generateRandomLatLng(from, to, fixed) {
     return ( (Math.random() * (to - from) + from).toFixed(fixed) * 1 );
   }
