@@ -162,19 +162,7 @@
     });
   }
 
-  function removeCPUFish(){
-    var remove = function(e){
-      e.preventDefault();
-      e.stopPropogation();
-      var key = $(this).data('key');
-      if(confirm('Are you sure?')){
-        firebase.database().ref("movies").child(key).remove();
-      }
-    }
-  }
- 
-  //$(document).on('click', <marker click> remove);
- 
+
   function levelImg(level) {
     if(level<=0)
       return icons.level0.icon;
