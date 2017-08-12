@@ -163,15 +163,15 @@
   }
 
   function levelImg(level) {
-    if(level<=10)
-      return icons.level0.icon;
-    else if(level>10 && level<=20)
+    if(level===0)
       return icons.level1.icon;
-    else if(level>20 && level<=30)
+    else if(level>0 && level<=10)
+      return icons.level1.icon;
+    else if(level>10 && level<=20)
       return icons.level2.icon;
-    else if(level>30 && level<=40)
+    else if(level>20 && level<=30)
       return icons.level3.icon;
-    else if(level>40)
+    else if(level>30)
       return icons.level4.icon;
   }
 
