@@ -182,17 +182,13 @@
     map.panTo(marker.getPosition());
   }
 
-  function emptyCPUFish(){
-    database.ref('cpuFish/').remove();
-  }
-
-  function addCPUFish(latitude, longitude, name, level) {
-    database.ref('cpuFish/').push({lat: latitude, lng: longitude, name: name, level: level});
-  }
+  // function emptyCPUFish(){
+  //   database.ref('fish/').remove();
+  // }
 
   function generateRandomLatLngCPUFish() {
     counter=1;
-    getLatLng();
+    // getLatLng();
     setInterval(getLatLng, 30*1000);
   }
 
@@ -202,7 +198,7 @@
     data_name = data_name + counter;
     randomLat = generateRandomLatLng(-85, 85, 3);
     randomLng = generateRandomLatLng(-180, 180, 3);      
-    addCPUFish(randomLat, randomLng, data_name, cpuFishLevel);
+    addMarker(randomLat, randomLng, data_name, cpuFishLevel);
     counter++;
     // console.log("lat - " + randomLat);
     // console.log("lng - " + randomLng);   
