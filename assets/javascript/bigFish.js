@@ -17,15 +17,16 @@
   });
 
   // Enables bottom collapsible
-  $(document).ready(function(){
+  $(document).ready(function(){      
+    generateRandomLatLngCPUFish();
     $('.collapsible').collapsible('open', 0);
-
   });
 
   var database = firebase.database();
   var map = null;
-  var timerOn= false;
   var playerName = '';
+
+  var counter=1;
   var icons = {
           level0: {
             icon: 'assets/images/fish-level-0.png'            
@@ -54,11 +55,11 @@
     console.log(localStorage.getItem('name'));
     if (localStorage.getItem('name') == null ) {
       login();
-    } else {loadPlayer();}
-    
+    } else {loadPlayer();}    
 
     // Player initial position select
     google.maps.event.addListener(map, 'click', function(event) {
+      
       if (localStorage.getItem('name') == null) {
         var latLng = event.latLng;
         var latitude = latLng.lat();
@@ -174,30 +175,35 @@
       return icons.level4.icon;
   }
 
-  function stopTimer() {
-    clearTimeout(t);
-    timerOn = false;  
+  //centers the map at clicked marker. 
+  function centerMapAtMarker(marker) {
+    //if you need animation use panTo, else use setCenter    
+    // map.setCenter(marker.getPosition());
+    map.panTo(marker.getPosition());
   }
+
+  // function emptyCPUFish(){
+  //   database.ref('fish/').remove();
+  // }
 
   function generateRandomLatLngCPUFish() {
-    if (!timerOn) {
-        timerOn = true;
-        intervalId = setInterval(decrement, 1000);
-        getLatLng();
-    }
-    
+    counter=1;
+    // getLatLng();
+    setInterval(getLatLng, 30*1000);
   }
 
-  function getLatLng() {
-    
-    var randonLng = 0, randomLat = 0;
-    for (var i = 0; i < randomCount; i++) {
-      //get random lat/lng
-      randomLat = generateRandomLatLng(90, -90, 3);
-      randomLng = generateRandomLatLng(180, -180, 3);      
-    }
+  function getLatLng() {    
+    var randonLng = 0, randomLat = 0, data_name="cpuFish", cpuFishLevel = 0;
+    //get random lat/lng
+    data_name = data_name + counter;
+    randomLat = generateRandomLatLng(-85, 85, 3);
+    randomLng = generateRandomLatLng(-180, 180, 3);      
+    addMarker(randomLat, randomLng, data_name, cpuFishLevel);
+    counter++;
+    // console.log("lat - " + randomLat);
+    // console.log("lng - " + randomLng);   
   }
 
-  function generateRandomLatLng(to, from, fixed) {
+  function generateRandomLatLng(from, to, fixed) {
     return ( (Math.random() * (to - from) + from).toFixed(fixed) * 1 );
   }
