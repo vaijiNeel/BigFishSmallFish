@@ -24,8 +24,9 @@
 
   var database = firebase.database();
   var map = null;
-  var timerOn=false, counter=1;
   var playerName = '';
+
+  var counter=1;
   var icons = {
           level0: {
             icon: 'assets/images/fish-level-0.png'            
@@ -174,16 +175,25 @@
       return icons.level4.icon;
   }
 
-  function stopTimer() {
-    clearTimeout(t);
-    timerOn = false;  
+  //centers the map at clicked marker. 
+  function centerMapAtMarker(marker) {
+    //if you need animation use panTo, else use setCenter    
+    // map.setCenter(marker.getPosition());
+    map.panTo(marker.getPosition());
+  }
+
+  function emptyCPUFish(){
+    database.ref('cpuFish/').remove();
+  }
+
+  function addCPUFish(latitude, longitude, name, level) {
+    database.ref('cpuFish/').push({lat: latitude, lng: longitude, name: name, level: level});
   }
 
   function generateRandomLatLngCPUFish() {
-    for (var i = 0; i < 50; i++) {
-      getLatLng();
-    }  
-    
+    counter=1;
+    getLatLng();
+    setInterval(getLatLng, 30*1000);
   }
 
   function getLatLng() {    
@@ -191,12 +201,11 @@
     //get random lat/lng
     data_name = data_name + counter;
     randomLat = generateRandomLatLng(-85, 85, 3);
-    randomLng = generateRandomLatLng(-180, 180, 3); 
-    console.log("lat - " + randomLat);
-    console.log("lng - " + randomLng);
-    
-    addMarker(randomLat, randomLng, data_name, cpuFishLevel);
+    randomLng = generateRandomLatLng(-180, 180, 3);      
+    addCPUFish(randomLat, randomLng, data_name, cpuFishLevel);
     counter++;
+    // console.log("lat - " + randomLat);
+    // console.log("lng - " + randomLng);   
   }
 
   function generateRandomLatLng(from, to, fixed) {
