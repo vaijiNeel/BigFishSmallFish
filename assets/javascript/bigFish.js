@@ -162,18 +162,19 @@
     });
   }
 
-function levelImg(level) {
-  if(level==0)
-    return icons.level0.icon;
-  else if(level<=10)
-    return icons.level1.icon;
-  else if(level>10 && level<=20)
-    return icons.level2.icon;
-  else if(level>20 && level<=30)
-    return icons.level3.icon;
-  else if(level>30)
-    return icons.level4.icon;
-}
+
+  function levelImg(level) {
+    if(level<=0)
+      return icons.level0.icon;
+    else if(level>0 && level<=1)
+      return icons.level1.icon;
+    else if(level>1 && level<=2)
+      return icons.level2.icon;
+    else if(level>2 && level<=3)
+      return icons.level3.icon;
+    else if(level>3)
+      return icons.level4.icon;    
+  }
 
   //centers the map at clicked marker. 
   function centerMapAtMarker(marker) {
