@@ -2,8 +2,30 @@ body {
 	background: black;
 }
 
+table {
+	float: left;
+	width: 400px;
+	padding-top: 20px;
+
+}
+
+section {
+	padding-top: 42px;
+}
+
+th {
+	width: 50px;
+}
+
+#munch {
+	height: 75px;
+	width: 100px;
+	display: none;
+	float: left;
+}
+
 .main-content {
-	height: 750px;
+	height: 600px;
 }
 
 #map {
@@ -18,16 +40,23 @@ body {
 	margin-bottom: 0px;
 }
 
-.container {
-	height: 100%;
-}
-
 .info-header {
-	height: : 20%;
+	padding: 2px;
 }
 
 #player-fish {
-	float: left;
-	width: 200px;
-	height: 200px;
+	width: 175px;
+	height: 150px;
+}
+
+.s6 {
+	height: 150px;
+}
+
+.collapsible-body {
+	padding: 10px;
+}
+
+.display-content {
+	border: 1px solid blue;
 }
