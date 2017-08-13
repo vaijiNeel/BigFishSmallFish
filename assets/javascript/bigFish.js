@@ -25,6 +25,8 @@
   var database = firebase.database();
   var map = null;
   var playerName = '';
+  var playerLevel = 1;
+  var userLocal = 'https://fish-project-ca094.firebaseio.com/';
 
   var counter=1;
   var icons = {
@@ -57,13 +59,19 @@
       login();
     } else {loadPlayer();}    
 
+    // Show menu on New Game button click
+    $('#new-game').on('click', function(event) {
+      event.preventDefault();
+      login();
+    });
+
     // Player initial position select
     google.maps.event.addListener(map, 'click', function(event) {
       
       if (localStorage.getItem('name') == null) {
         var latLng = event.latLng;
-        var latitude = latLng.lat();
-        var longitude = latLng.lng();
+        var latitude = parseInt(latLng.lat());
+        var longitude = parseInt(latLng.lng());
 
         addMarker(latitude, longitude, playerName, 1);
 
@@ -71,6 +79,8 @@
         localStorage.setItem("latitude", latitude);
         localStorage.setItem("longitude", longitude);
         localStorage.setItem("level", 1);
+        $('#player-pin-lat').text(latitude);
+        $('#player-pin-lng').text(longitude);
       } 
     });
 
@@ -99,7 +109,16 @@
     });
     $('#new-fish').on('click', function() {
       $('#new-fish-modal').modal('open');
+      $('#player-pin-name, #player-pin-level, #player-pin-lat, #player-pin-lng').text('');
+      playerLevel = 1;
+      $('#player-fish').attr('src', 'assets/images/tuna1.png');
       localStorage.clear();
+    });
+    $('#back-btn').on('click', function(event) {
+      event.preventDefault();
+      $('#find-name').val('');
+      $('#username-modal').modal('close');
+      $('#intro-modal').modal('open');
     });
     $('#submit-fish-name').on('click', function(event) {
       event.preventDefault();
@@ -107,13 +126,15 @@
       if ( tmp !== '') {
         playerName = $('#record-name').val().trim();
         $('#new-fish-modal').modal('close');
+        $('#player-pin-name').text(playerName);
+        $('#player-pin-level').text(playerLevel);
       }
     });
     $('#find-fish-name').on('click', function(event) {
       event.preventDefault();
       var tmp = $('#find-name').val().trim();
       // needs to check if entered username is in the firebase database
-    })
+    });
   }
 
   // Loads player fish onto screen
@@ -121,8 +142,19 @@
     var tmpName = localStorage.getItem("name");
     var tmpLat = parseInt(localStorage.getItem("latitude"));
     var tmpLong = parseInt(localStorage.getItem("longitude"));
-    var tmpLvl = localStorage.getItem("level");
-    showMarkerOnFrontend(tmpLat, tmpLong, tmpName, tmpLvl);
+    playerLevel = parseInt(localStorage.getItem("level"));
+    showMarkerOnFrontend(tmpLat, tmpLong, tmpName, playerLevel);
+    $('#player-pin-name').text(tmpName);
+    $('#player-pin-level').text(playerLevel);
+    $('#player-pin-lat').text(tmpLat);
+    $('#player-pin-lng').text(tmpLong);
+    if (playerLevel >= 10) {
+        $('#player-fish').attr('src', 'assets/images/swordfish1.png');
+      } else if (playerLevel >= 20) {
+        $('#player-fish').attr('src', 'assets/images/shark1.png');
+      } else if (playerLevel >= 30) {
+        $('#player-fish').attr('src', 'assets/images/monster1.png');
+    }
   }
 
   /**
@@ -145,15 +177,42 @@
       customInfo: {name, level}
     });
 
+    // What happens when you click on another fish
     google.maps.event.addDomListener(marker, 'click', function(e) {
-      alert("clicked marker");
+
+      // Animations for eating a fish
+      $('#player-fish').addClass('animated rubberBand');
+      $('#munch').css('display', 'inline');
+      $('#munch').addClass('animated fadeInUp');
+      $('#player-fish').one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', function() {
+        $(this).removeClass('animated rubberBand');
+      });
+      $('#munch').one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', function() {
+        $(this).removeClass('animated fadeInUp');
+        $(this).css('display', 'none');
+      });
+
+      playerLevel+=1;
+      localStorage.setItem('level', playerLevel);
+      $('#player-pin-level').text(playerLevel);
+      if (playerLevel >= 10) {
+        $('#player-fish').attr('src', 'assets/images/swordfish1.png');
+      } else if (playerLevel >= 20) {
+        $('#player-fish').attr('src', 'assets/images/shark1.png');
+      } else if (playerLevel >= 30) {
+        $('#player-fish').attr('src', 'assets/images/monster1.png');
+      }
     });
+
+    // Hover over fish markers
     google.maps.event.addDomListener(marker, 'mouseover', function(e) {
       $("#fish-pin-name").text(this.customInfo.name);
       $("#fish-pin-level").text(this.customInfo.level);
-      $("#fish-pin-lat").text(this.position.lat());
-      $("#fish-pin-lng").text(this.position.lng());
+      $("#fish-pin-lat").text(parseInt(this.position.lat()));
+      $("#fish-pin-lng").text(parseInt(this.position.lng()));
     });
+
+    // Stop hovering over fish markers
     google.maps.event.addDomListener(marker, 'mouseout', function(e) {
       $("#fish-pin-name").text("");
       $("#fish-pin-level").text("");

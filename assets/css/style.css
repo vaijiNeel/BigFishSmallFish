@@ -2,8 +2,59 @@ body {
 	background: black;
 }
 
+table {
+	float: left;
+	width: 400px;
+	padding-top: 20px;
+
+}
+
+section {
+	padding-top: 42px;
+}
+
+th {
+	width: 50px;
+}
+
+.container {
+	font-family: 'Permanent Marker', cursive;
+}
+
+.header {
+	background: #6c4eff;
+	color: white;
+}
+
+#new-game {
+	width: 200px;
+	margin-top: 8px;
+	margin-right: 8px;
+	background: green;
+	font-size: 20px;
+}
+
+.title {
+	margin-left: 8px;
+	margin-top: 8px;
+}
+
+#player-stats {
+	width: 100px;
+}
+
+#munch {
+	height: 75px;
+	width: 100px;
+	display: none;
+	z-index: 2;
+	position: absolute;
+	left: 110px;
+}
+
 .main-content {
-	height: 750px;
+	height: 600px;
+	border: 10px ridge #6c4eff;
 }
 
 #map {
@@ -18,10 +69,31 @@ body {
 	margin-bottom: 0px;
 }
 
-.container {
-	height: 100%;
+.info-header {
+	padding: 2px;
 }
 
-.info-header {
-	height: : 20%;
+#player-fish {
+	width: 175px;
+	height: 150px;
+	position: relative;
+}
+
+.s6 {
+	height: 150px;
+}
+
+.collapsible-body {
+	padding: 10px;
+}
+
+.display-content {
+	border: 1px solid blue;
+	height: 155px;
+}
+
+#player-wrapper {
+	border: 1px solid black;
+	position: absolute;
+	width: 20%;
 }
