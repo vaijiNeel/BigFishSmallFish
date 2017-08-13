@@ -58,13 +58,19 @@
       login();
     } else {loadPlayer();}    
 
+    // Show menu on New Game button click
+    $('#new-game').on('click', function(event) {
+      event.preventDefault();
+      login();
+    });
+
     // Player initial position select
     google.maps.event.addListener(map, 'click', function(event) {
       
       if (localStorage.getItem('name') == null) {
         var latLng = event.latLng;
-        var latitude = latLng.lat();
-        var longitude = latLng.lng();
+        var latitude = parseInt(latLng.lat());
+        var longitude = parseInt(latLng.lng());
 
         addMarker(latitude, longitude, playerName, 1);
 
@@ -102,6 +108,9 @@
     });
     $('#new-fish').on('click', function() {
       $('#new-fish-modal').modal('open');
+      $('#player-pin-name, #player-pin-level, #player-pin-lat, #player-pin-lng').text('');
+      playerLevel = 1;
+      $('#player-fish').attr('src', 'assets/images/tuna1.png');
       localStorage.clear();
     });
     $('#back-btn').on('click', function(event) {
@@ -169,6 +178,8 @@
 
     // What happens when you click on another fish
     google.maps.event.addDomListener(marker, 'click', function(e) {
+
+      // Animations for eating a fish
       $('#player-fish').addClass('animated rubberBand');
       $('#munch').css('display', 'inline');
       $('#munch').addClass('animated fadeInUp');
@@ -179,14 +190,15 @@
         $(this).removeClass('animated fadeInUp');
         $(this).css('display', 'none');
       });
+
       playerLevel+=1;
       localStorage.setItem('level', playerLevel);
       $('#player-pin-level').text(playerLevel);
-      if (playerLevel == 10) {
+      if (playerLevel >= 10) {
         $('#player-fish').attr('src', 'assets/images/swordfish1.png');
-      } else if (playerLevel == 20) {
+      } else if (playerLevel >= 20) {
         $('#player-fish').attr('src', 'assets/images/shark1.png');
-      } else if (playerLevel == 30) {
+      } else if (playerLevel >= 30) {
         $('#player-fish').attr('src', 'assets/images/monster1.png');
       }
     });
@@ -195,8 +207,8 @@
     google.maps.event.addDomListener(marker, 'mouseover', function(e) {
       $("#fish-pin-name").text(this.customInfo.name);
       $("#fish-pin-level").text(this.customInfo.level);
-      $("#fish-pin-lat").text(this.position.lat());
-      $("#fish-pin-lng").text(this.position.lng());
+      $("#fish-pin-lat").text(parseInt(this.position.lat()));
+      $("#fish-pin-lng").text(parseInt(this.position.lng()));
     });
 
     // Stop hovering over fish markers

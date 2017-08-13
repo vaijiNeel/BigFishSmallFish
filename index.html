@@ -14,6 +14,9 @@
 	<!-- Link to css files -->
 	<link rel="stylesheet" type="text/css" href="assets/css/reset.css">	
 	<link rel="stylesheet" type="text/css" href="assets/css/style.css">	
+
+	<!-- Google Font link -->
+	<link href="https://fonts.googleapis.com/css?family=Permanent+Marker" rel="stylesheet">
 	
 	<!-- Link to jquery -->
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
@@ -31,6 +34,14 @@
 <body>
 
 	<div class="container">
+		<nav>
+			<div class="nav-wrapper header">
+				<a href="#" class="brand-logo title">Big Fish Little Fish</a>
+				<ul id="nav-mobile" class="right">
+					<li><a class="waves-effect waves-light btn" id="new-game">New Game</a></li>
+				</ul>
+			</div>
+		</nav>
 		<div class="main-content row">
 			<div class="col s12" id="map"></div>
    		</div>
@@ -68,19 +79,20 @@
 		<div class="info-content row">
 			<ul class="info col s12 collapsible" data-collapsible="accordion">
 				<li>
-					<div class="collapsible-header info-header">Fish Info</div>
+					<div class="collapsible-header info-header">Information</div>
 					<div class="collapsible-body">
 						<div class="display-content row">
 							<div id="player-wrapper">
-								<div class="munch col s1">
+								<!-- <div class="munch">
 									<img id="munch" src="assets/images/munch.png">
-								</div>
+								</div> -->
 								<div class="player-pic col s2">
+									<img id="munch" src="assets/images/munch.png">
 									<img id="player-fish" src="assets/images/tuna1.png">
 								</div>
-								<div class="player-info col s2">
+								<div class="col s2 offset-s4" id="player-info">
 									<section>
-								        <table class="striped">
+								        <table id="player-stats">
 								          <tr>
 								            <th>Name: </th>
 								            <td id="player-pin-name"></td>
@@ -101,7 +113,7 @@
 								    </section>
 								</div>
 							</div>
-							<div class="fish-info col s2">
+							<div class="fish-info col s2 offset-s4">
 								<section>
 							        <table>
 							          <tr>
