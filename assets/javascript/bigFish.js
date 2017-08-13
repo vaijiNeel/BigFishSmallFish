@@ -10,7 +10,35 @@
   firebase.initializeApp(config);
   var database = firebase.database();
 
-  // Records new fish name created by player
+  var map = null;
+  var playerName = '';
+  var myKey = null;
+
+  var counter=1;
+  var icons = {
+    level0: {
+      icon: 'assets/images/fish-level-0.png',
+      highlightedIcon: 'assets/images/fish-level-0-highlighted.png'             
+    },
+    level1: {
+      icon: 'assets/images/fish-level-1.png',
+      highlightedIcon: 'assets/images/fish-level-1-highlighted.png'
+    },
+    level2: {
+      icon: 'assets/images/fish-level-2.png',
+      highlightedIcon: 'assets/images/fish-level-2-highlighted.png'
+    },
+    level3: {
+      icon: 'assets/images/fish-level-3.png',
+      highlightedIcon: 'assets/images/fish-level-3-highlighted.png'
+    },
+    level4: {
+      icon: 'assets/images/fish-level-4.png',
+      highlightedIcon: 'assets/images/fish-level-4-highlighted.png'
+    }
+  };
+
+    // Records new fish name created by player
   $("#create-fish").on('click', function() {
     event.preventDefault();
     playerName = $('#player-name').val().trim();
@@ -19,32 +47,9 @@
 
   // Enables bottom collapsible
   $(document).ready(function(){      
-    generateRandomLatLngCPUFish();
+    // generateRandomLatLngCPUFish();
     $('.collapsible').collapsible('open', 0);
   });
-
-  var map = null;
-  var playerName = '';
-  var myKey = null;
-
-  var counter=1;
-  var icons = {
-    level0: {
-      icon: 'assets/images/fish-level-0.png'            
-    },
-    level1: {
-      icon: 'assets/images/fish-level-1.png'
-    },
-    level2: {
-      icon: 'assets/images/fish-level-2.png'
-    },
-    level3: {
-      icon: 'assets/images/fish-level-3.png'
-    },
-    level4: {
-      icon: 'assets/images/fish-level-4.png'
-    }
-  };
   
   function initMap() {
     var myName = "Iris";
@@ -53,30 +58,19 @@
       zoom: 4,
       center: uluru
     });
-    console.log(localStorage.getItem('name'));
     if (localStorage.getItem('name') == null ) {
       login();
     } else {loadPlayer();}    
 
     // Player initial position select
     google.maps.event.addListener(map, 'click', function(event) {
-
       // if (localStorage.getItem('name') == null) {
         var latLng = event.latLng;
         var latitude = latLng.lat();
         var longitude = latLng.lng();
 
-        addMarker(latitude, longitude, playerName, 1);
-
-        localStorage.setItem("name", playerName);
-        localStorage.setItem("latitude", latitude);
-        localStorage.setItem("longitude", longitude);
-        localStorage.setItem("level", 1);
+        addMarker(latitude, longitude, playerName, 1, true);
       // } 
-    });
-
-    database.ref('fish/').on("value", function(snapshot) {
-      console.log(snapshot.val());
     });
 
     // Whenever a fish gets added to the database, then it gets displayed on the frontend, too.
@@ -120,6 +114,7 @@
 
   // Loads player fish onto screen
   function loadPlayer() {
+    playerName = localStorage.getItem("name");
     var tmpName = localStorage.getItem("name");
     var tmpLat = parseInt(localStorage.getItem("latitude"));
     var tmpLong = parseInt(localStorage.getItem("longitude"));
@@ -131,12 +126,20 @@
   /**
   * Adds a new marker. Saves the marker to the database.
   */
-  function addMarker(latitude, longitude, name, level) {
+  function addMarker(latitude, longitude, name, level, isMyNewlyAddedFish = false) {
+    if(isMyNewlyAddedFish) {
+      localStorage.setItem("myKey", "");
+      localStorage.setItem("name", name);
+      localStorage.setItem("latitude", latitude);
+      localStorage.setItem("longitude", longitude);
+      localStorage.setItem("level", level);
+    }
     var justAddedUserMarker = database.ref('fish/').push({lat: latitude, lng: longitude, name: name, level: level});
-    console.log(justAddedUserMarker);
-    var myKey = justAddedUserMarker.key;
-    localStorage.setItem("myKey", myKey);
-    myKey = myKey;
+    if(isMyNewlyAddedFish) {
+      var myKey = justAddedUserMarker.key;
+      localStorage.setItem("myKey", myKey);
+      myKey = myKey;
+    }
   }
 
   /**
@@ -145,19 +148,25 @@
   */
   function showMarkerOnFrontend(latitude, longitude, name, level, dataSnapshot) {
     var markerLocation = {lat: latitude, lng: longitude};
+    var customData = {"name": name, "level": level, "key": dataSnapshot.key};
+    var isIconHighlighted = false;
+    if(typeof localStorage.myKey !== "undefined" && localStorage.myKey != "") {
+      isIconHighlighted = (localStorage.myKey === dataSnapshot.key);
+    } else if(typeof localStorage.name !== "undefined" && localStorage.name != "" && typeof localStorage.latitude !== "undefined" && typeof localStorage.longitude !== "undefined") {
+      isIconHighlighted = (localStorage.getItem("name") == dataSnapshot.val().name && localStorage.getItem("latitude") == dataSnapshot.val().lat
+                            && localStorage.getItem("longitude") == dataSnapshot.val().lng);
+    }
+    var iconImage = levelImg(level, isIconHighlighted);
     var marker = new google.maps.Marker({
       position: markerLocation,
-      icon: levelImg(level),   
+      icon: iconImage,   
       map: map,     
-      customInfo: {"name": name, "level": level, "key": dataSnapshot.key}
+      customInfo: customData
     });
 
     google.maps.event.addDomListener(marker, 'click', function(e) {
       // Eating of other fish occurs here.
       var myFishKey = localStorage.getItem("myKey");
-      alert(myFishKey);
-      debugger;
-      console.log(e);
       var targetFishKey = this.customInfo.key;
       if(myFishKey !== targetFishKey) {
         var targetFish = database.ref("fish").child(targetFishKey);
@@ -167,19 +176,15 @@
         var targetLevel = null;
         var myLevel = null;
         targetFish.once("value", function(snapshot) {
-          debugger;
           targetLat = snapshot.val().lat;
           targetLng = snapshot.val().lng;
           targetLevel = snapshot.val().level;
           myLevel = localStorage.getItem("level");
-          debugger;
           if(myLevel !== null && targetLevel !== null && targetLat !== null && targetLng !== null) {
-            debugger;
             if(myLevel > targetLevel) {
               targetFish.remove();
               // TODO update user fish here.
-              debugger;
-              updateFish(targetLat, targetLng, localStorage.getItem("level"));
+              updateMyFish(targetLat, targetLng, parseInt(localStorage.getItem("level")) + 1);
             }
           }
         });
@@ -200,26 +205,30 @@
     });
   }
 
-  function updateFish(updatedLat, updatedLng, currentLevel) {
+  function updateMyFish(updatedLat, updatedLng, currentLevel) {
     // TODO implement.
-    debugger;
     var fishKey = localStorage.getItem("myKey");
     var fishRef = database.ref("fish").child(fishKey);
-    var upgradeLevel = parseInt(currentLevel) + 1;
+    var upgradeLevel = parseInt(currentLevel);
     fishRef.update({"level": upgradeLevel, "lat": updatedLat, "lng": updatedLng});
+    localStorage.setItem("level", upgradeLevel);
+    localStorage.setItem("lat", updatedLat);
+    localStorage.setItem("lng", updatedLng);
   }
 
-  function levelImg(level) {
-    if(level<=0)
-      return icons.level0.icon;
-    else if(level>0 && level<=1)
-      return icons.level1.icon;
-    else if(level>1 && level<=2)
-      return icons.level2.icon;
-    else if(level>2 && level<=3)
-      return icons.level3.icon;
-    else if(level>3)
-      return icons.level4.icon;    
+  function levelImg(level, isHighlighted) {
+    var iconLevel = icons.level0;
+    if(level>0 && level<=1) {
+      iconLevel = icons.level1;
+    } else if(level>1 && level<=2) {
+      iconLevel = icons.level2;
+    } else if(level>2 && level<=3) {
+      iconLevel = icons.level3;
+    } else if(level>3) {
+      iconLevel = icons.level4;    
+    }
+    var iconImage = (isHighlighted) ? iconLevel.highlightedIcon : iconLevel.icon;
+    return iconImage;
   }
 
   //centers the map at clicked marker. 
@@ -247,8 +256,6 @@
     randomLng = generateRandomLatLng(-180, 180, 3);      
     addMarker(randomLat, randomLng, data_name, cpuFishLevel);
     counter++;
-    // console.log("lat - " + randomLat);
-    // console.log("lng - " + randomLng);   
   }
 
   function generateRandomLatLng(from, to, fixed) {
