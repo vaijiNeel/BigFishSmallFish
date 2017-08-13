@@ -26,6 +26,7 @@
   var map = null;
   var playerName = '';
   var playerLevel = 1;
+  var userLocal = 'https://fish-project-ca094.firebaseio.com/';
 
   var counter=1;
   var icons = {
@@ -133,7 +134,7 @@
       event.preventDefault();
       var tmp = $('#find-name').val().trim();
       // needs to check if entered username is in the firebase database
-    })
+    });
   }
 
   // Loads player fish onto screen
