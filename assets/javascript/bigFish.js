@@ -97,7 +97,6 @@
       reverseMappingDbKeyToMarker[localStorage.myKey].setPosition({lat: targetLat, lng: targetLng});
       reverseMappingDbKeyToMarker[localStorage.myKey].customInfo.level++;
       reverseMappingDbKeyToMarker[localStorage.myKey].icon = levelImg(reverseMappingDbKeyToMarker[localStorage.myKey].customInfo.level, true);
-      centerMapAtMarker(reverseMappingDbKeyToMarker[localStorage.myKey]);
       
     }, function(errorObject) {
       console.log('Errors handled: ' + errorObject.code);
@@ -184,6 +183,10 @@
       map: map,     
       customInfo: customData
     });
+    var isMarkerMyFish = isIconHighlighted;
+    if(isMarkerMyFish) {
+      centerMapAtMarker(marker);
+    }
 
     // Creates a way for the pin to get deleted or updated in real time, should a database change for a fish occur.
     reverseMappingDbKeyToMarker[marker.customInfo.key] = marker;
