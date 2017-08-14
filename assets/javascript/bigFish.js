@@ -49,16 +49,16 @@
 
   // Enables bottom collapsible
   $(document).ready(function(){      
-    // generateRandomLatLngCPUFish();
+    generateRandomLatLngCPUFish();
     $('.collapsible').collapsible('open', 0);
   });
   
   function initMap() {
-    var myName = "Iris";
-    var uluru = {lat: -25.363, lng: 131.044};
+    const DEFAULT_MAP_CENTER = {lat: 0, lng: 0};
+    const DEFAULT_MAP_ZOOM = 1;
     map = new google.maps.Map(document.getElementById('map'), {
-      zoom: 4,
-      center: uluru
+      zoom: DEFAULT_MAP_ZOOM,
+      center: DEFAULT_MAP_CENTER
     });
     if (localStorage.getItem('name') == null ) {
       login();
