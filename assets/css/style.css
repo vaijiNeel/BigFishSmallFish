@@ -18,12 +18,13 @@ th {
 }
 
 .container {
-	font-family: 'Permanent Marker', cursive;
+	font-family: 'Quando', serif;
 }
 
 .header {
 	background: #6c4eff;
 	color: white;
+	font-family: 'Indie Flower', cursive;
 }
 
 #new-game {
@@ -88,12 +89,10 @@ th {
 }
 
 .display-content {
-	border: 1px solid blue;
 	height: 155px;
 }
 
 #player-wrapper {
-	border: 1px solid black;
 	position: absolute;
 	width: 20%;
 }

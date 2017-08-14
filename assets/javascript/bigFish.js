@@ -150,11 +150,15 @@
     $('#player-pin-lng').text(tmpLong);
     if (playerLevel >= 10) {
         $('#player-fish').attr('src', 'assets/images/swordfish1.png');
-      } else if (playerLevel >= 20) {
+      }
+    if (playerLevel >= 20) {
         $('#player-fish').attr('src', 'assets/images/shark1.png');
-      } else if (playerLevel >= 30) {
+    }
+    if (playerLevel >= 30) {
         $('#player-fish').attr('src', 'assets/images/monster1.png');
     }
+    //center map at the player fish location
+    centerMapAtMarker(tmpLat, tmpLong);
   }
 
   /**
@@ -197,9 +201,11 @@
       $('#player-pin-level').text(playerLevel);
       if (playerLevel >= 10) {
         $('#player-fish').attr('src', 'assets/images/swordfish1.png');
-      } else if (playerLevel >= 20) {
+      }
+      if (playerLevel >= 20) {
         $('#player-fish').attr('src', 'assets/images/shark1.png');
-      } else if (playerLevel >= 30) {
+      }
+      if (playerLevel >= 30) {
         $('#player-fish').attr('src', 'assets/images/monster1.png');
       }
     });
@@ -210,6 +216,7 @@
       $("#fish-pin-level").text(this.customInfo.level);
       $("#fish-pin-lat").text(parseInt(this.position.lat()));
       $("#fish-pin-lng").text(parseInt(this.position.lng()));
+      var weatherReport = openweathermap(this.position.lat(),this.position.lng());      
     });
 
     // Stop hovering over fish markers
@@ -218,6 +225,7 @@
       $("#fish-pin-level").text("");
       $("#fish-pin-lat").text("");
       $("#fish-pin-lng").text("");
+      $('#temp, #sunrise, #sunset, #weather-detail').text("");
     });
   }
 
@@ -236,34 +244,80 @@
   }
 
   //centers the map at clicked marker. 
-  function centerMapAtMarker(marker) {
-    //if you need animation use panTo, else use setCenter    
-    // map.setCenter(marker.getPosition());
-    map.panTo(marker.getPosition());
+  function centerMapAtMarker(lati, long) {
+    var latLng = new google.maps.LatLng(lati, long); //Makes a latlng
+    map.panTo(latLng); 
+    console.log("center map playerFish lat/lng - " + lati + ", " + long);
   }
 
-  // function emptyCPUFish(){
-  //   database.ref('fish/').remove();
-  // }
+  //function to remove all data in firebase
+  function emptyCPUFish(){
+    database.ref('fish/').remove();
+  }
 
+  //function to display cpufish randomly on the map. Every 30 seconds 1 fish is displayed
   function generateRandomLatLngCPUFish() {
     counter=1;
-    // getLatLng();
+    getLatLng();
     setInterval(getLatLng, 30*1000);
   }
 
+  //function to calculate random latitude and longitude for cpuFish
   function getLatLng() {    
     var randonLng = 0, randomLat = 0, data_name="cpuFish", cpuFishLevel = 0;
-    //get random lat/lng
     data_name = data_name + counter;
     randomLat = generateRandomLatLng(-85, 85, 3);
     randomLng = generateRandomLatLng(-180, 180, 3);      
     addMarker(randomLat, randomLng, data_name, cpuFishLevel);
     counter++;
-    // console.log("lat - " + randomLat);
-    // console.log("lng - " + randomLng);   
+    console.log("lat - " + randomLat);
+    console.log("lng - " + randomLng);   
   }
 
+  //random generator
   function generateRandomLatLng(from, to, fixed) {
     return ( (Math.random() * (to - from) + from).toFixed(fixed) * 1 );
   }
+
+  //function to get weather details based on lat/lng
+  function openweathermap(lat, lng) {
+    var markerLat = lat, markerLng = lng, messageToDisplayInHTML="No Result From API";
+    var queryURL = 'https://cors-anywhere.herokuapp.com/http://api.openweathermap.org/data/2.5/weather?lat='+markerLat+'&lon='+markerLng+
+    '&appid=143499e04ed7429a089d8617a8425c15';
+    console.log(queryURL);
+    $.ajax({
+      url: queryURL,
+      method: "GET"
+    }).done(function(response) {
+      console.log(response);
+      console.log("weather " + response.weather[0]);
+      var temp = response.main.temp;
+      temp = Math.floor((temp - 273.15) * 1.80 + 32);
+      console.log("temp - " + temp);
+      $('#temp').text(temp);
+      var sunrise = msToTime(response.sys.sunrise) + " AM";
+      console.log("sunrise - " + sunrise);
+      $('#sunrise').text(sunrise);
+      var sunset = msToTime(response.sys.sunset) + " PM";
+      console.log("sunset - " + sunset);
+      $('#sunset').text(sunset);
+      messageToDisplayInHTML = "Weather Details - Main: " + response.weather[0].main + ", Description: " + 
+        response.weather[0].description + ", Temperature (F): " + temp + ", Sunrise Time: " + sunrise +
+        ", Sunset Time: " + sunset;
+      console.log(messageToDisplayInHTML);
+      $('#weather-detail').text(response.weather[0].main + ', ' + response.weather[0].description);
+      return messageToDisplayInHTML;
+    });   
+  }
+
+  //function to convert milliseconds to time format hh:mm:ss
+  function msToTime(duration) {
+    var milliseconds = parseInt((duration%1000)/100),
+      seconds = parseInt((duration/1000)%60),
+      minutes = parseInt((duration/(1000*60))%60),
+      hours = parseInt((duration/(1000*60*60))%24);
+    hours = (hours < 10) ? "0" + hours : hours;
+    minutes = (minutes < 10) ? "0" + minutes : minutes;
+    seconds = (seconds < 10) ? "0" + seconds : seconds;
+    return hours + ":" + minutes + ":" + seconds;
+}
