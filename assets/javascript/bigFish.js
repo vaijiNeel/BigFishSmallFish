@@ -148,14 +148,17 @@
     $('#player-pin-level').text(playerLevel);
     $('#player-pin-lat').text(tmpLat);
     $('#player-pin-lng').text(tmpLong);
+    if (playerLevel < 10) {
+      $('#player-fish').attr('src', 'assets/images/tuna1.png');
+    }
     if (playerLevel >= 10) {
         $('#player-fish').attr('src', 'assets/images/swordfish1.png');
       }
     if (playerLevel >= 20) {
-        $('#player-fish').attr('src', 'assets/images/shark1.png');
+        $('#player-fish').attr('src', 'assets/images/shark.png');
     }
     if (playerLevel >= 30) {
-        $('#player-fish').attr('src', 'assets/images/monster1.png');
+        $('#player-fish').attr('src', 'assets/images/monster.png');
     }
     //center map at the player fish location
     centerMapAtMarker(tmpLat, tmpLong);
@@ -196,6 +199,7 @@
         $(this).css('display', 'none');
       });
 
+      // Raises player's level and adjusts their picture appropriately
       playerLevel+=1;
       localStorage.setItem('level', playerLevel);
       $('#player-pin-level').text(playerLevel);
@@ -203,10 +207,10 @@
         $('#player-fish').attr('src', 'assets/images/swordfish1.png');
       }
       if (playerLevel >= 20) {
-        $('#player-fish').attr('src', 'assets/images/shark1.png');
+        $('#player-fish').attr('src', 'assets/images/shark.png');
       }
       if (playerLevel >= 30) {
-        $('#player-fish').attr('src', 'assets/images/monster1.png');
+        $('#player-fish').attr('src', 'assets/images/monster.png');
       }
     });
 
@@ -233,13 +237,13 @@
   function levelImg(level) {
     if(level<=0)
       return icons.level0.icon;
-    else if(level>0 && level<=1)
+    else if(level>0 && level<=9)
       return icons.level1.icon;
-    else if(level>1 && level<=2)
+    else if(level>9 && level<=19)
       return icons.level2.icon;
-    else if(level>2 && level<=3)
+    else if(level>19 && level<=29)
       return icons.level3.icon;
-    else if(level>3)
+    else if(level>29)
       return icons.level4.icon;    
   }
 

@@ -50,7 +50,6 @@ th {
 	display: none;
 	z-index: 2;
 	position: absolute;
-	left: 110px;
 }
 
 .main-content {
@@ -72,11 +71,13 @@ th {
 
 .info-header {
 	padding: 2px;
+	background: #fbf9f9;
 }
 
 #player-fish {
 	width: 175px;
 	height: 150px;
+	z-index: 1;
 	position: relative;
 }
 
@@ -92,7 +93,22 @@ th {
 	height: 155px;
 }
 
-#player-wrapper {
+/*#player-wrapper {
 	position: absolute;
 	width: 20%;
+}*/
+
+@media screen and (max-width: 768px) and (min-width: 641px) {
+/*	.container {
+		width: 100%;
+		margin-left: 68px;
+	}
+
+	#player-wrapper {
+		width: 100%;
+	}
+
+	.info-wrapper {
+		width: 100%;
+	}*/
 }
