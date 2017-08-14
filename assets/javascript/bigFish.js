@@ -234,8 +234,10 @@
     });
   }
 
+  /**
+  * Updates information for the player's fish.
+  */
   function updateMyFish(updatedLat, updatedLng, currentLevel) {
-    // TODO implement.
     var fishKey = localStorage.getItem("myKey");
     var fishRef = database.ref("fish").child(fishKey);
     var upgradeLevel = parseInt(currentLevel);
