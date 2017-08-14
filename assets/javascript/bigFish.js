@@ -26,7 +26,6 @@
   var map = null;
   var playerName = '';
   var playerLevel = 1;
-  var userLocal = 'https://fish-project-ca094.firebaseio.com/';
 
   var counter=1;
   var icons = {
