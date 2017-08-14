@@ -259,11 +259,11 @@
     return iconImage;
   }
 
-  //centers the map at clicked marker. 
-  function centerMapAtMarker(lati, long) {
-    var latLng = new google.maps.LatLng(lati, long); //Makes a latlng
-    map.panTo(latLng); 
-    console.log("center map playerFish lat/lng - " + lati + ", " + long);
+   //centers the map at clicked marker. 
+  function centerMapAtMarker(marker) {
+    //if you need animation use panTo, else use setCenter    
+    // map.setCenter(marker.getPosition());
+    map.panTo(marker.getPosition());
   }
 
   /**
