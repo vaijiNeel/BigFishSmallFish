@@ -225,7 +225,8 @@
       $("#fish-pin-level").text(this.customInfo.level);
       $("#fish-pin-lat").text(this.position.lat());
       $("#fish-pin-lng").text(this.position.lng());
-      var weatherReport = openweathermap(this.position.lat(),this.position.lng());      
+      var weatherReport = openweathermap(this.position.lat(),this.position.lng());
+      console.log(weatherReport);
     });
     google.maps.event.addDomListener(marker, 'mouseout', function(e) {
       $("#fish-pin-name").text("");
@@ -242,8 +243,8 @@
     var upgradeLevel = parseInt(currentLevel);
     fishRef.update({"level": upgradeLevel, "lat": updatedLat, "lng": updatedLng});
     localStorage.setItem("level", upgradeLevel);
-    localStorage.setItem("lat", updatedLat);
-    localStorage.setItem("lng", updatedLng);
+    localStorage.setItem("latitude", updatedLat);
+    localStorage.setItem("longitude", updatedLng);
   }
 
   function levelImg(level, isHighlighted) {
@@ -268,19 +269,17 @@
     console.log("center map playerFish lat/lng - " + lati + ", " + long);
   }
 
-  //function to remove all data in firebase
-  function emptyCPUFish(){
-    database.ref('fish/').remove();
-  }
-
-  //function to display cpufish randomly on the map. Every 30 seconds 1 fish is displayed
+  /**
+  * Displays cpufish randomly on the map. Every 30 seconds 1 fish is displayed.
+  */
   function generateRandomLatLngCPUFish() {
-    counter=1;
-    getLatLng();
+    counter = 1;
     setInterval(getLatLng, 30*1000);
   }
 
-  //function to calculate random latitude and longitude for cpuFish
+  /**
+  * Calculates random latitude and longitude for cpuFish.
+  */
   function getLatLng() {    
     var randomLng = 0, randomLat = 0, data_name="cpuFish", cpuFishLevel = 0;
     data_name = data_name + counter;
@@ -325,11 +324,11 @@
   //function to convert milliseconds to time format hh:mm:ss
   function msToTime(duration) {
     var milliseconds = parseInt((duration%1000)/100),
-      seconds = parseInt((duration/1000)%60),
-      minutes = parseInt((duration/(1000*60))%60),
-      hours = parseInt((duration/(1000*60*60))%24);
+    seconds = parseInt((duration/1000)%60),
+    minutes = parseInt((duration/(1000*60))%60),
+    hours = parseInt((duration/(1000*60*60))%24);
     hours = (hours < 10) ? "0" + hours : hours;
     minutes = (minutes < 10) ? "0" + minutes : minutes;
     seconds = (seconds < 10) ? "0" + seconds : seconds;
     return hours + ":" + minutes + ":" + seconds;
-}
+  }
