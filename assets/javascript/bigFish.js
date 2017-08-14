@@ -155,8 +155,7 @@
       $("#fish-pin-level").text(this.customInfo.level);
       $("#fish-pin-lat").text(this.position.lat());
       $("#fish-pin-lng").text(this.position.lng());
-      var weatherReport = openweathermap(this.position.lat(),this.position.lng());
-      console.log(weatherReport);
+      var weatherReport = openweathermap(this.position.lat(),this.position.lng());      
     });
     google.maps.event.addDomListener(marker, 'mouseout', function(e) {
       $("#fish-pin-name").text("");
