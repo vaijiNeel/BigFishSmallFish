@@ -123,6 +123,8 @@
     var tmpLong = parseInt(localStorage.getItem("longitude"));
     var tmpLvl = localStorage.getItem("level");
     showMarkerOnFrontend(tmpLat, tmpLong, tmpName, tmpLvl);
+    //center map at the player fish location
+    centerMapAtMarker(tmpLat, tmpLong);
   }
 
   /**
@@ -178,7 +180,12 @@
       return icons.level4.icon;    
   }
 
-  
+  //centers the map at clicked marker. 
+  function centerMapAtMarker(lati, long) {
+    var latLng = new google.maps.LatLng(lati, long); //Makes a latlng
+    map.panTo(latLng); 
+    console.log("center map playerFish lat/lng - " + lati + ", " + long);
+  }
 
   //function to remove all data in firebase
   function emptyCPUFish(){
