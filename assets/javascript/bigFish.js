@@ -14,6 +14,8 @@
   var playerName = '';
   var myKey = null;
 
+  var reverseMappingDbKeyToMarker = [];
+
   var counter=1;
   var icons = {
     level0: {
@@ -64,13 +66,13 @@
 
     // Player initial position select
     google.maps.event.addListener(map, 'click', function(event) {
-      // if (localStorage.getItem('name') == null) {
+      if (localStorage.getItem('name') == null) {
         var latLng = event.latLng;
         var latitude = latLng.lat();
         var longitude = latLng.lng();
 
         addMarker(latitude, longitude, playerName, 1, true);
-      // } 
+      } 
     });
 
     // Whenever a fish gets added to the database, then it gets displayed on the frontend, too.
@@ -78,6 +80,25 @@
       var childSnapshotVal = childSnapshot.val();
       var markerKey = childSnapshot.key;
       showMarkerOnFrontend(childSnapshotVal.lat, childSnapshotVal.lng, childSnapshotVal.name, childSnapshotVal.level, childSnapshot);
+    }, function(errorObject) {
+      console.log('Errors handled: ' + errorObject.code);
+    });
+
+    database.ref('fish/').on("child_removed", function(childSnapshot) {
+      var childSnapshotVal = childSnapshot.val();
+      var key = childSnapshot.key;
+      var targetMarker = reverseMappingDbKeyToMarker[key];
+      var targetLat = targetMarker.position.lat();
+      var targetLng = targetMarker.position.lng();
+      // Removes the fish that gets eaten on fronted in real time. 
+      // This means it removes the pin representing the fish that gets deleted in the database.
+      reverseMappingDbKeyToMarker[key].setMap(null);
+      // Moves the pin representing the user's fish to the location of the fish it is eating.
+      reverseMappingDbKeyToMarker[localStorage.myKey].setPosition({lat: targetLat, lng: targetLng});
+      reverseMappingDbKeyToMarker[localStorage.myKey].customInfo.level++;
+      reverseMappingDbKeyToMarker[localStorage.myKey].icon = levelImg(reverseMappingDbKeyToMarker[localStorage.myKey].customInfo.level, true);
+      centerMapAtMarker(reverseMappingDbKeyToMarker[localStorage.myKey]);
+      
     }, function(errorObject) {
       console.log('Errors handled: ' + errorObject.code);
     });
@@ -164,6 +185,9 @@
       customInfo: customData
     });
 
+    // Creates a way for the pin to get deleted or updated in real time, should a database change for a fish occur.
+    reverseMappingDbKeyToMarker[marker.customInfo.key] = marker;
+
     google.maps.event.addDomListener(marker, 'click', function(e) {
       // Eating of other fish occurs here.
       var myFishKey = localStorage.getItem("myKey");
@@ -183,7 +207,7 @@
           if(myLevel !== null && targetLevel !== null && targetLat !== null && targetLng !== null) {
             if(myLevel > targetLevel) {
               targetFish.remove();
-              // TODO update user fish here.
+              // User fish gets updated here, when it eats another fish.
               updateMyFish(targetLat, targetLng, parseInt(localStorage.getItem("level")) + 1);
             }
           }
@@ -254,7 +278,7 @@
     data_name = data_name + counter;
     randomLat = generateRandomLatLng(-85, 85, 3);
     randomLng = generateRandomLatLng(-180, 180, 3);      
-    addMarker(randomLat, randomLng, data_name, cpuFishLevel);
+    addMarker(randomLat, randomLng, data_name, 0);
     counter++;
   }
 
