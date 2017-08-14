@@ -219,7 +219,7 @@
   //function to get weather details based on lat/lng
   function openweathermap(lat, lng) {
     var markerLat = lat, markerLng = lng, messageToDisplayInHTML="No Result From API";
-    var queryURL = 'https://api.openweathermap.org/data/2.5/weather?lat='+markerLat+'&lon='+markerLng+
+    var queryURL = 'https://cors-anywhere.herokuapp.com/http://api.openweathermap.org/data/2.5/weather?lat='+markerLat+'&lon='+markerLng+
     '&appid=143499e04ed7429a089d8617a8425c15';
     console.log(queryURL);
     $.ajax({
