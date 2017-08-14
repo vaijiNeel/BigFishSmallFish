@@ -264,7 +264,7 @@
 
   //function to calculate random latitude and longitude for cpuFish
   function getLatLng() {    
-    var randonLng = 0, randomLat = 0, data_name="cpuFish", cpuFishLevel = 0;
+    var randomLng = 0, randomLat = 0, data_name="cpuFish", cpuFishLevel = 0;
     data_name = data_name + counter;
     randomLat = generateRandomLatLng(-85, 85, 3);
     randomLng = generateRandomLatLng(-180, 180, 3);      
