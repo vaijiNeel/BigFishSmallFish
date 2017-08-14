@@ -140,7 +140,9 @@
     var tmpLong = parseInt(localStorage.getItem("longitude"));
     var tmpLvl = localStorage.getItem("level");
     myKey = localStorage.getItem("myKey");
-    // addMarker(tmpLat, tmpLong, tmpName, tmpLvl);
+    showMarkerOnFrontend(tmpLat, tmpLong, tmpName, tmpLvl);
+    //center map at the player fish location
+    centerMapAtMarker(tmpLat, tmpLong);
   }
 
   /**
@@ -261,12 +263,15 @@
   }
 
   //centers the map at clicked marker. 
-  function centerMapAtMarker(marker) {
-    //if you need animation use panTo, else use setCenter    
-    // map.setCenter(marker.getPosition());
-    map.panTo(marker.getPosition());
+  function centerMapAtMarker(lati, long) {
+    var latLng = new google.maps.LatLng(lati, long); //Makes a latlng
+    map.panTo(latLng); 
+    console.log("center map playerFish lat/lng - " + lati + ", " + long);
   }
 
+  /**
+  * Displays cpufish randomly on the map. Every 30 seconds 1 fish is displayed.
+  */
   function generateRandomLatLngCPUFish() {
     counter = 1;
     setInterval(getLatLng, 30*1000);
@@ -276,9 +281,7 @@
   * Calculates random latitude and longitude for cpuFish.
   */
   function getLatLng() {    
-    debugger;
-    var randonLng = 0, randomLat = 0, data_name="cpuFish", cpuFishLevel = 0;
-    //get random lat/lng
+    var randomLng = 0, randomLat = 0, data_name="cpuFish", cpuFishLevel = 0;
     data_name = data_name + counter;
     randomLat = generateRandomLatLng(-85, 85, 3);
     randomLng = generateRandomLatLng(-180, 180, 3);      
@@ -286,44 +289,37 @@
     counter++;
   }
 
+  //random generator
   function generateRandomLatLng(from, to, fixed) {
     return ( (Math.random() * (to - from) + from).toFixed(fixed) * 1 );
   }
 
-
-  //function to get weather details based on latlng
+  //function to get weather details based on lat/lng
   function openweathermap(lat, lng) {
-   var markerLat = lat;
-   var markerLng = lng; 
-   
-   var queryURL = 'https://cors-anywhere.herokuapp.com/http://api.openweathermap.org/data/2.5/weather?lat='+markerLat+'&lon='+markerLng+
-   '&appid=143499e04ed7429a089d8617a8425c15';
-   // var queryURL = 'http://api.openweathermap.org/data/2.5/weather?lat='+markerLat+'&lon='+markerLng+
-   // '&appid=143499e04ed7429a089d8617a8425c15';
-   console.log(queryURL);
-   $.ajax({
-     url: queryURL,
-     method: "GET"
-   }).done(function(response) {       console.log(response);
-     console.log("weather " + response.weather[0]);
-     var temp = response.main.temp;
-     temp = Math.floor((temp - 3.15) * 1.80 + 32);
-     console.log("temp - " + temp);
-     var sunrise = msToTime(response.sys.sunrise) + " AM";
-     console.log("sunrise - " +sunrise);
-     var sunset = msToTime(response.sys.sunset) + " PM";
-     console.log("sunset - " + sunset);
-     var messageToDisplayInHTML = "Weather Details - Main: " + response.weather[0].main;
-     messageToDisplayInHTML += ", Description: " + response.weather[0].description;
-     messageToDisplayInHTML += ", Temperature (F): " + temp + ", Sunrise Time: " + sunrise + ", Sunset Time: " + sunset;
-     console.log(messageToDisplayInHTML);
-     return messageToDisplayInHTML;
-   }).fail(function(response) {
-    var messageToDisplayInHTML="No Result From API";
-    console.log(messageToDisplayInHTML);
-    return messageToDisplayInHTML;
-  });   
- }
+    var markerLat = lat, markerLng = lng, messageToDisplayInHTML="No Result From API";
+    var queryURL = 'https://cors-anywhere.herokuapp.com/http://api.openweathermap.org/data/2.5/weather?lat='+markerLat+'&lon='+markerLng+
+    '&appid=143499e04ed7429a089d8617a8425c15';
+    console.log(queryURL);
+    $.ajax({
+      url: queryURL,
+      method: "GET"
+    }).done(function(response) {
+      console.log(response);
+      console.log("weather " + response.weather[0]);
+      var temp = response.main.temp;
+      temp = Math.floor((temp - 273.15) * 1.80 + 32);
+      console.log("temp - " + temp);
+      var sunrise = msToTime(response.sys.sunrise) + " AM";
+      console.log("sunrise - " + sunrise);
+      var sunset = msToTime(response.sys.sunset) + " PM";
+      console.log("sunset - " + sunset);
+      messageToDisplayInHTML = "Weather Details - Main: " + response.weather[0].main + ", Description: " + 
+        response.weather[0].description + ", Temperature (F): " + temp + ", Sunrise Time: " + sunrise +
+        ", Sunset Time: " + sunset;
+      console.log(messageToDisplayInHTML);
+      return messageToDisplayInHTML;
+    });   
+  }
 
   //function to convert milliseconds to time format hh:mm:ss
   function msToTime(duration) {
