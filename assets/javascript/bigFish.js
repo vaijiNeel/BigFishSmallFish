@@ -222,9 +222,9 @@
       $("#fish-pin-level").text(this.customInfo.level);
       $("#fish-pin-lat").text(this.position.lat());
       $("#fish-pin-lng").text(this.position.lng());
-      var weatherReport = openweathermap(this.position.lat(),this.position.lng());
-      console.log(weatherReport);
+      var weatherReport = getWeatherReport(this.position.lat(),this.position.lng());      
     });
+    
     google.maps.event.addDomListener(marker, 'mouseout', function(e) {
       $("#fish-pin-name").text("");
       $("#fish-pin-level").text("");
@@ -292,7 +292,7 @@
   }
 
   //function to get weather details based on lat/lng
-  function openweathermap(lat, lng) {
+  function getWeatherReport(lat, lng) {
     var markerLat = lat, markerLng = lng, messageToDisplayInHTML="No Result From API";
     var queryURL = 'https://cors-anywhere.herokuapp.com/http://api.openweathermap.org/data/2.5/weather?lat='+markerLat+'&lon='+markerLng+
     '&appid=143499e04ed7429a089d8617a8425c15';
