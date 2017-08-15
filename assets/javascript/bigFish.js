@@ -100,14 +100,23 @@
       var targetLng = targetMarker.position.lng();
       // Removes the fish that gets eaten on fronted in real time. 
       // This means it removes the pin representing the fish that gets deleted in the database.
-      reverseMappingDbKeyToMarker[key].setMap(null);
+      var eatenFishMarker = reverseMappingDbKeyToMarker[key];
+      eatenFishMarker.setMap(null);
       // Moves the pin representing the user's fish to the location of the fish it is eating.
-      reverseMappingDbKeyToMarker[localStorage.myKey].setPosition({lat: targetLat, lng: targetLng});
-      reverseMappingDbKeyToMarker[localStorage.myKey].customInfo.level++;
-      reverseMappingDbKeyToMarker[localStorage.myKey].icon = levelImg(reverseMappingDbKeyToMarker[localStorage.myKey].customInfo.level, true);
+      // var myFishMarker = reverseMappingDbKeyToMarker[localStorage.myKey];
+      // myFishMarker.setPosition({lat: targetLat, lng: targetLng});
+      // myFishMarker.customInfo.level++;
+      // var isHighlighted = false;
+      // myFishMarker.icon = levelImg(reverseMappingDbKeyToMarker[localStorage.myKey].customInfo.level, isHighlighted);
       
     }, function(errorObject) {
       console.log('Errors handled: ' + errorObject.code);
+    });
+    database.ref('fish/').on("child_changed", function(childSnapshot) {
+      var changedFishMarker = reverseMappingDbKeyToMarker[childSnapshot.key];
+      changedFishMarker.setPosition({lat: childSnapshot.val().lat, lng: childSnapshot.val().lng});
+      changedFishMarker.customInfo.level = childSnapshot.val().level;
+      changedFishMarker.icon = levelImg(childSnapshot.val().level);
     });
   }
 
