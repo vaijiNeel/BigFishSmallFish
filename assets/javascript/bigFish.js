@@ -344,7 +344,7 @@
   */
   function generateRandomLatLngCPUFish() {
     counter = 1;
-    setInterval(getLatLng, 30*1000);
+    setInterval(getLatLng, 300*1000);
   }
 
   /**
