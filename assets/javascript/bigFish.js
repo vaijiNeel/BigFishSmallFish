@@ -171,16 +171,16 @@
     $('#player-pin-level').text(tmpLvl);
     $('#player-pin-lat').text(tmpLat);
     $('#player-pin-lng').text(tmpLong);
-    if (tmpLvl < 10) {
+    if (tmpLvl >= 1) {
       $('#player-fish').attr('src', 'assets/images/tuna1.png');
     }
-    if (tmpLvl >= 10) {
+    if (tmpLvl >= 2) {
         $('#player-fish').attr('src', 'assets/images/swordfish1.png');
       }
-    if (tmpLvl >= 20) {
+    if (tmpLvl >= 3) {
         $('#player-fish').attr('src', 'assets/images/shark.png');
     }
-    if (tmpLvl >= 30) {
+    if (tmpLvl >= 4) {
         $('#player-fish').attr('src', 'assets/images/monster.png');
     }
     myKey = localStorage.getItem("myKey");
@@ -302,13 +302,13 @@
     var upgradeLevel = parseInt(currentLevel);
     fishRef.update({"level": upgradeLevel, "lat": updatedLat, "lng": updatedLng});
 
-    if (upgradeLevel >= 10) {
+    if (upgradeLevel >= 2) {
       $('#player-fish').attr('src', 'assets/images/swordfish1.png');
     }
-    if (upgradeLevel >= 20) {
+    if (upgradeLevel >= 3) {
       $('#player-fish').attr('src', 'assets/images/shark.png');
     }
-    if (upgradeLevel >= 30) {
+    if (upgradeLevel >= 4) {
       $('#player-fish').attr('src', 'assets/images/monster.png');
     }
 
