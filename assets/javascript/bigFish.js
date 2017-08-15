@@ -115,6 +115,8 @@
     database.ref('fish/').on("child_changed", function(childSnapshot) {
       var changedFishMarker = reverseMappingDbKeyToMarker[childSnapshot.key];
       changedFishMarker.setPosition({lat: childSnapshot.val().lat, lng: childSnapshot.val().lng});
+      changedFishMarker.customInfo.level = childSnapshot.val().level;
+      changedFishMarker.icon = levelImg(childSnapshot.val().level);
     });
   }
 
