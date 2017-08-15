@@ -13,6 +13,7 @@
   var map = null;
   var playerName = '';
   var myKey = null;
+  var gameOver = false;
 
   var reverseMappingDbKeyToMarker = [];
 
@@ -102,6 +103,10 @@
       // This means it removes the pin representing the fish that gets deleted in the database.
       var eatenFishMarker = reverseMappingDbKeyToMarker[key];
       eatenFishMarker.setMap(null);
+      if (key == localStorage.getItem('myKey')) {
+        gameOver = true;
+        login();
+      }
       // Moves the pin representing the user's fish to the location of the fish it is eating.
       // var myFishMarker = reverseMappingDbKeyToMarker[localStorage.myKey];
       // myFishMarker.setPosition({lat: targetLat, lng: targetLng});
@@ -123,12 +128,23 @@
 
   // Prompts user with login menu
   function login() {
-    $('#intro-modal, #new-fish-modal, #username-modal').modal({
+    $('.modal').modal({
       dismissible: false
     });
 
-    // 
-    $('#intro-modal').modal('open');
+    if (gameOver) {
+      $('#gameover-modal').modal('open');
+      $('#death-level').text('You made it to level ' + localStorage.getItem('level') + '!');
+      localStorage.clear();
+      gameOver = false;
+    } else {
+      $('#intro-modal').modal('open');
+    }
+
+    $('#start-over').on('click', function(event) {
+      $('#new-fish-modal').modal('open');
+    });
+
     $('#exist-fish').on('click', function(event) {
       event.preventDefault();
       $('#username-modal').modal('open');
@@ -137,8 +153,6 @@
     // Hitting 'No' when asked if user has existing fish
     $('#new-fish').on('click', function() {
       $('#new-fish-modal').modal('open');
-      $('#player-pin-name, #player-pin-level, #player-pin-lat, #player-pin-lng').text('');
-      $('#player-fish').attr('src', 'assets/images/tuna1.png');
       localStorage.clear();
     });
 
@@ -153,9 +167,12 @@
     // Hitting 'Submit' when creating a fish name
     $('#submit-fish-name').on('click', function(event) {
       event.preventDefault();
+      $('#player-pin-name, #player-pin-level, #player-pin-lat, #player-pin-lng').text('');
+      $('#player-fish').attr('src', 'assets/images/tuna1.png');
       var tmp = $('#record-name').val().trim();
       if ( tmp !== '') {
         playerName = $('#record-name').val().trim();
+        $('#record-name').val('');
         $('#new-fish-modal').modal('close');
         $('#player-pin-name').text(playerName);
       }
@@ -250,19 +267,6 @@
       var myFishKey = localStorage.getItem("myKey");
       var targetFishKey = this.customInfo.key;
       if(myFishKey !== targetFishKey) {
-
-        // Animations for eating a fish
-        $('#player-fish').addClass('animated rubberBand');
-        $('#munch').css('display', 'inline');
-        $('#munch').addClass('animated fadeInUp');
-        $('#player-fish').one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', function() {
-          $(this).removeClass('animated rubberBand');
-        });
-        $('#munch').one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', function() {
-          $(this).removeClass('animated fadeInUp');
-          $(this).css('display', 'none');
-        });
-
         var targetFish = database.ref("fish").child(targetFishKey);
         var myFish = database.ref("fish").child(myFishKey);
         var targetLat = null;
@@ -277,6 +281,17 @@
           if(myLevel !== null && targetLevel !== null && targetLat !== null && targetLng !== null) {
             if(myLevel > targetLevel) {
               targetFish.remove();
+              // Animations for eating a fish
+              $('#player-fish').addClass('animated rubberBand');
+              $('#munch').css('display', 'inline');
+              $('#munch').addClass('animated fadeInUp');
+              $('#player-fish').one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', function() {
+                $(this).removeClass('animated rubberBand');
+              });
+              $('#munch').one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', function() {
+                $(this).removeClass('animated fadeInUp');
+                $(this).css('display', 'none');
+              });
               // User fish gets updated here, when it eats another fish.
               updateMyFish(targetLat, targetLng, parseInt(localStorage.getItem("level")) + 1);
               $('#player-pin-level').text(parseInt(myLevel) + 1);
