@@ -1,4 +1,4 @@
-  // Initialize Firebase
+ // Initialize Firebase
   var config = {
     apiKey: "AIzaSyBDETBXl4ZLh_0lrEcF-3zJLEUd25Hnji0",
     authDomain: "fish-project-ca094.firebaseapp.com",
@@ -62,7 +62,13 @@
     });
     if (localStorage.getItem('name') == null ) {
       login();
-    } else {loadPlayer();}    
+    } else {loadPlayer();}
+
+    // Show menu on New Game button click
+    $('#new-game').on('click', function(event) {
+      event.preventDefault();
+      login();
+    });   
 
     // Player initial position select
     google.maps.event.addListener(map, 'click', function(event) {
@@ -72,6 +78,8 @@
         var longitude = latLng.lng();
 
         addMarker(latitude, longitude, playerName, 1, true);
+        $('#player-pin-lat').text(parseInt(latitude));
+        $('#player-pin-lng').text(parseInt(longitude));
       } 
     });
 
@@ -108,23 +116,42 @@
     $('#intro-modal, #new-fish-modal, #username-modal').modal({
       dismissible: false
     });
+
+    // 
     $('#intro-modal').modal('open');
     $('#exist-fish').on('click', function(event) {
       event.preventDefault();
       $('#username-modal').modal('open');
     });
+
+    // Hitting 'No' when asked if user has existing fish
     $('#new-fish').on('click', function() {
       $('#new-fish-modal').modal('open');
+      $('#player-pin-name, #player-pin-level, #player-pin-lat, #player-pin-lng').text('');
+      $('#player-fish').attr('src', 'assets/images/tuna1.png');
       localStorage.clear();
     });
+
+    // Back button on username search modal
+    $('#back-btn').on('click', function(event) {
+      event.preventDefault();
+      $('#find-name').val('');
+      $('#username-modal').modal('close');
+      $('#intro-modal').modal('open');
+    });
+
+    // Hitting 'Submit' when creating a fish name
     $('#submit-fish-name').on('click', function(event) {
       event.preventDefault();
       var tmp = $('#record-name').val().trim();
       if ( tmp !== '') {
         playerName = $('#record-name').val().trim();
         $('#new-fish-modal').modal('close');
+        $('#player-pin-name').text(playerName);
       }
     });
+
+    // Button for searching for username
     $('#find-fish-name').on('click', function(event) {
       event.preventDefault();
       var tmp = $('#find-name').val().trim();
@@ -139,6 +166,23 @@
     var tmpLat = parseInt(localStorage.getItem("latitude"));
     var tmpLong = parseInt(localStorage.getItem("longitude"));
     var tmpLvl = localStorage.getItem("level");
+
+    $('#player-pin-name').text(tmpName);
+    $('#player-pin-level').text(tmpLvl);
+    $('#player-pin-lat').text(tmpLat);
+    $('#player-pin-lng').text(tmpLong);
+    if (tmpLvl >= 1) {
+      $('#player-fish').attr('src', 'assets/images/tuna1.png');
+    }
+    if (tmpLvl >= 2) {
+        $('#player-fish').attr('src', 'assets/images/swordfish1.png');
+      }
+    if (tmpLvl >= 3) {
+        $('#player-fish').attr('src', 'assets/images/shark.png');
+    }
+    if (tmpLvl >= 4) {
+        $('#player-fish').attr('src', 'assets/images/monster.png');
+    }
     myKey = localStorage.getItem("myKey");
   }
 
@@ -152,6 +196,7 @@
       localStorage.setItem("latitude", latitude);
       localStorage.setItem("longitude", longitude);
       localStorage.setItem("level", level);
+      $('#player-pin-level').text(level);
     }
     var justAddedUserMarker = database.ref('fish/').push({lat: latitude, lng: longitude, name: name, level: level});
     if(isMyNewlyAddedFish) {
@@ -195,6 +240,19 @@
       var myFishKey = localStorage.getItem("myKey");
       var targetFishKey = this.customInfo.key;
       if(myFishKey !== targetFishKey) {
+
+        // Animations for eating a fish
+        $('#player-fish').addClass('animated rubberBand');
+        $('#munch').css('display', 'inline');
+        $('#munch').addClass('animated fadeInUp');
+        $('#player-fish').one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', function() {
+          $(this).removeClass('animated rubberBand');
+        });
+        $('#munch').one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', function() {
+          $(this).removeClass('animated fadeInUp');
+          $(this).css('display', 'none');
+        });
+
         var targetFish = database.ref("fish").child(targetFishKey);
         var myFish = database.ref("fish").child(myFishKey);
         var targetLat = null;
@@ -211,6 +269,9 @@
               targetFish.remove();
               // User fish gets updated here, when it eats another fish.
               updateMyFish(targetLat, targetLng, parseInt(localStorage.getItem("level")) + 1);
+              $('#player-pin-level').text(parseInt(myLevel) + 1);
+              $('#player-pin-lat').text(parseInt(targetLat));
+              $('#player-pin-lng').text(parseInt(targetLng));
             }
           }
         });
@@ -220,8 +281,8 @@
     google.maps.event.addDomListener(marker, 'mouseover', function(e) {
       $("#fish-pin-name").text(this.customInfo.name);
       $("#fish-pin-level").text(this.customInfo.level);
-      $("#fish-pin-lat").text(this.position.lat());
-      $("#fish-pin-lng").text(this.position.lng());
+      $("#fish-pin-lat").text(parseInt(this.position.lat()));
+      $("#fish-pin-lng").text(parseInt(this.position.lng()));
       var weatherReport = getWeatherReport(this.position.lat(),this.position.lng());      
     });
     
@@ -230,6 +291,7 @@
       $("#fish-pin-level").text("");
       $("#fish-pin-lat").text("");
       $("#fish-pin-lng").text("");
+      $('#temp, #sunrise, #sunset, #weather-detail').text("");
     });
   }
 
@@ -239,6 +301,17 @@
     var fishRef = database.ref("fish").child(fishKey);
     var upgradeLevel = parseInt(currentLevel);
     fishRef.update({"level": upgradeLevel, "lat": updatedLat, "lng": updatedLng});
+
+    if (upgradeLevel >= 2) {
+      $('#player-fish').attr('src', 'assets/images/swordfish1.png');
+    }
+    if (upgradeLevel >= 3) {
+      $('#player-fish').attr('src', 'assets/images/shark.png');
+    }
+    if (upgradeLevel >= 4) {
+      $('#player-fish').attr('src', 'assets/images/monster.png');
+    }
+
     localStorage.setItem("level", upgradeLevel);
     localStorage.setItem("latitude", updatedLat);
     localStorage.setItem("longitude", updatedLng);
@@ -271,7 +344,7 @@
   */
   function generateRandomLatLngCPUFish() {
     counter = 1;
-    setInterval(getLatLng, 30*1000);
+    setInterval(getLatLng, 300*1000);
   }
 
   /**
@@ -314,6 +387,10 @@
         response.weather[0].description + ", Temperature (F): " + temp + ", Sunrise Time: " + sunrise +
         ", Sunset Time: " + sunset;
       console.log(messageToDisplayInHTML);
+      $('#temp').text(temp);
+      $('#sunrise').text(sunrise);
+      $('#sunset').text(sunset);
+      $('#weather-detail').text(response.weather[0].main + ', ' + response.weather[0].description);
       return messageToDisplayInHTML;
     });   
   }

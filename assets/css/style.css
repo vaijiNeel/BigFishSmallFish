@@ -2,8 +2,59 @@ body {
 	background: black;
 }
 
+table {
+	float: left;
+	width: 400px;
+	padding-top: 20px;
+
+}
+
+section {
+	padding-top: 42px;
+}
+
+th {
+	width: 50px;
+}
+
+.container {
+	font-family: 'Quando', serif;
+}
+
+.header {
+	background: #6c4eff;
+	color: white;
+	font-family: 'Indie Flower', cursive;
+}
+
+#new-game {
+	width: 200px;
+	margin-top: 8px;
+	margin-right: 8px;
+	background: green;
+	font-size: 20px;
+}
+
+.title {
+	margin-left: 8px;
+	margin-top: 8px;
+}
+
+#player-stats {
+	width: 100px;
+}
+
+#munch {
+	height: 75px;
+	width: 100px;
+	display: none;
+	z-index: 2;
+	position: absolute;
+}
+
 .main-content {
-	height: 750px;
+	height: 600px;
+	border: 10px ridge #6c4eff;
 }
 
 #map {
@@ -18,10 +69,46 @@ body {
 	margin-bottom: 0px;
 }
 
-.container {
-	height: 100%;
+.info-header {
+	padding: 2px;
+	background: #fbf9f9;
 }
 
-.info-header {
-	height: : 20%;
+#player-fish {
+	width: 175px;
+	height: 150px;
+	z-index: 1;
+	position: relative;
+}
+
+.s6 {
+	height: 150px;
+}
+
+.collapsible-body {
+	padding: 10px;
+}
+
+.display-content {
+	height: 155px;
+}
+
+/*#player-wrapper {
+	position: absolute;
+	width: 20%;
+}*/
+
+@media screen and (max-width: 768px) and (min-width: 641px) {
+/*	.container {
+		width: 100%;
+		margin-left: 68px;
+	}
+
+	#player-wrapper {
+		width: 100%;
+	}
+
+	.info-wrapper {
+		width: 100%;
+	}*/
 }
