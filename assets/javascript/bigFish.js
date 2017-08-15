@@ -116,7 +116,8 @@
       var changedFishMarker = reverseMappingDbKeyToMarker[childSnapshot.key];
       changedFishMarker.setPosition({lat: childSnapshot.val().lat, lng: childSnapshot.val().lng});
       changedFishMarker.customInfo.level = childSnapshot.val().level;
-      changedFishMarker.icon = levelImg(childSnapshot.val().level);
+      var isMyFish = (childSnapshot.key == localStorage.myKey);
+      changedFishMarker.icon = levelImg(childSnapshot.val().level, isMyFish);
     });
   }
 
