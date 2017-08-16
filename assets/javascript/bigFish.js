@@ -8,15 +8,15 @@
     messagingSenderId: "542377547666"
   };
   firebase.initializeApp(config);
-  var database = firebase.database();
 
+  //-------------global data------------
+
+  var database = firebase.database();
   var map = null;
   var playerName = '';
   var myKey = null;
   var gameOver = false;
-
   var reverseMappingDbKeyToMarker = [];
-
   var counter=1;
   var icons = {
     level0: {
@@ -41,29 +41,40 @@
     }
   };
 
-    // Records new fish name created by player
+  //------------Execution start--------------
+
+  $(document).ready(function(){      
+    generateRandomLatLngCPUFish();
+    //Enables bottom collapsible
+    $('.collapsible').collapsible('open', 0);
+  });
+  
+  //-----------------events-----------------
+
+  // Records new fish name created by player
   $("#create-fish").on('click', function() {
     event.preventDefault();
     playerName = $('#player-name').val().trim();
     $('#player-name').val('');
   });
 
-  // Enables bottom collapsible
-  $(document).ready(function(){      
-    generateRandomLatLngCPUFish();
-    $('.collapsible').collapsible('open', 0);
-  });
-  
+  //----------------functions-----------------
+
   function initMap() {
+    //initialize map
     const DEFAULT_MAP_CENTER = {lat: 0, lng: 0};
     const DEFAULT_MAP_ZOOM = 1;
     map = new google.maps.Map(document.getElementById('map'), {
       zoom: DEFAULT_MAP_ZOOM,
       center: DEFAULT_MAP_CENTER
     });
+
+    //if new player display login screen else load existing player
     if (localStorage.getItem('name') == null ) {
       login();
-    } else {loadPlayer();}
+    } else {
+      loadPlayer();
+    }
 
     // Show menu on New Game button click
     $('#new-game').on('click', function(event) {
@@ -93,6 +104,7 @@
       console.log('Errors handled: ' + errorObject.code);
     });
 
+    //whenever a fish is removed the marker in map is set to null
     database.ref('fish/').on("child_removed", function(childSnapshot) {
       var childSnapshotVal = childSnapshot.val();
       var key = childSnapshot.key;
@@ -117,6 +129,8 @@
     }, function(errorObject) {
       console.log('Errors handled: ' + errorObject.code);
     });
+
+    //fish change
     database.ref('fish/').on("child_changed", function(childSnapshot) {
       var changedFishMarker = reverseMappingDbKeyToMarker[childSnapshot.key];
       changedFishMarker.setPosition({lat: childSnapshot.val().lat, lng: childSnapshot.val().lng});
@@ -357,9 +371,9 @@
     return iconImage;
   }
 
-   //centers the map at clicked marker. 
+  //centers the map at clicked marker. 
   function centerMapAtMarker(marker) {
-    //if you need animation use panTo, else use setCenter    
+    //if you need animation, use panTo else use setCenter    
     // map.setCenter(marker.getPosition());
     map.panTo(marker.getPosition());
   }
@@ -369,18 +383,18 @@
   */
   function generateRandomLatLngCPUFish() {
     counter = 1;
-    setInterval(getLatLng, 300*1000);
+    setInterval(getLatLng, 120*1000);
   }
 
   /**
   * Calculates random latitude and longitude for cpuFish.
   */
   function getLatLng() {    
-    var randomLng = 0, randomLat = 0, data_name="cpuFish", cpuFishLevel = 0;
-    data_name = data_name + counter;
+    var randomLng = 0, randomLat = 0, dataName="cpuFish", cpuFishLevel = 0;
+    dataName = dataName + counter;
     randomLat = generateRandomLatLng(-85, 85, 3);
     randomLng = generateRandomLatLng(-180, 180, 3);      
-    addMarker(randomLat, randomLng, data_name, 0);
+    addMarker(randomLat, randomLng, dataName, 0);
     counter++;
   }
 
@@ -430,4 +444,23 @@
     minutes = (minutes < 10) ? "0" + minutes : minutes;
     seconds = (seconds < 10) ? "0" + seconds : seconds;
     return hours + ":" + minutes + ":" + seconds;
+  }
+
+  var userKey = "Krch_6rDHA4x-WLGyEP";
+  loadExistingData(userKey);
+  //function to load existing data from firebase to local storage
+  function loadExistingData(userKey) {
+    // var keyRef = database.ref("fish").child(userKey);
+    // keyRef.on("value", function(snapshot) {
+    //   console.log("load existing data - " + snapshot.val());
+    // });
+
+    var keyRef = database.ref('fish').child(userKey);
+    keyRef.once('value')
+    .then(function(snapshot) {
+      // var value = snapshot.val();
+      console.log("load existing data - " + snapshot.val());
+      // console.log('location:', value.account_capabilities);
+      // resp.json(value.account_capabilities);
+    });
   }
