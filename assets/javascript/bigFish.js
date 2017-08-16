@@ -180,6 +180,24 @@ var icons = {
       var isMyFish = (childSnapshot.key == localStorage.myKey);
       changedFishMarker.icon = levelImg(childSnapshot.val().level, isMyFish);
     });
+
+    var connectedRef = database.ref(".info/connected");
+    // When the client's connection state changes...
+    connectedRef.on("value", function(snap) {
+      // If they are connected..
+      if (snap.val()) {
+        if(localStorage.getItem("myKey")) {
+          var myFish = getDbFishRepresentationByKey(localStorage.getItem("myKey"));
+          myFish.on('value', function(snapShot) {
+            var snapShotValue = snapShot.val();
+            if(!snapShotValue) {
+              gameOver = true;
+              login();
+            }
+          });
+        }
+      }
+    });
   }
 
   // Prompts user with login menu
