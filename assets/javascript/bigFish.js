@@ -97,13 +97,6 @@ var icons = {
     } 
   });
 
-    function emptyLocalStorageFishInfo() {
-      localStorage.removeItem("name");
-      localStorage.removeItem("myKey");
-      localStorage.removeItem("level");
-      localStorage.removeItem("latitude");
-      localStorage.removeItem("longitude");
-    }
     /**
     * Can either highlight or unhighlight the marker representing a fish's marker specified by a certain key.
     */
@@ -198,6 +191,22 @@ var icons = {
         }
       }
     });
+
+    function emptyLocalStorageFishInfo() {
+      localStorage.removeItem("name");
+      localStorage.removeItem("myKey");
+      localStorage.removeItem("level");
+      localStorage.removeItem("latitude");
+      localStorage.removeItem("longitude");
+    }
+  }
+
+  function emptyLocalStorageFishInfo() {
+    localStorage.removeItem("name");
+    localStorage.removeItem("myKey");
+    localStorage.removeItem("level");
+    localStorage.removeItem("latitude");
+    localStorage.removeItem("longitude");
   }
 
   // Prompts user with login menu
@@ -209,13 +218,15 @@ var icons = {
     if (gameOver) {
       $('#gameover-modal').modal('open');
       $('#death-level').text('You made it to level ' + localStorage.getItem('level') + '!');
-      emptyLocalStorageFishInfo();
       gameOver = false;
     } else {
       $('#intro-modal').modal('open');
     }
 
     $('#start-over').on('click', function(event) {
+      event.preventDefault();
+      emptyLocalStorageFishInfo();
+      updatePlayerFishStatsText("", "", "", "", "");
       $('#new-fish-modal').modal('open');
     });
 
@@ -321,6 +332,8 @@ var icons = {
     if(isMyNewlyAddedFish) {
       var myKey = justAddedUserMarker.key;
       localStorage.setItem("myKey", myKey);
+      $("#player-pin-login-key").text(myKey);
+      $("#player-pin-name").text(name);
       myKey = myKey;
     }
   }
