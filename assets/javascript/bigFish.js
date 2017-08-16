@@ -51,6 +51,7 @@ var icons = {
   $(document).ready(function(){      
     generateRandomLatLngCPUFish();
     $('.collapsible').collapsible('open', 0);
+    $(".button-collapse").sideNav();
   });
   
   function initMap() {
@@ -252,7 +253,7 @@ var icons = {
     // Hitting 'Submit' when creating a fish name
     $('#submit-fish-name').on('click', function(event) {
       event.preventDefault();
-      $('#player-pin-name, #player-pin-level, #player-pin-lat, #player-pin-lng').text('');
+      $('#player-pin-name, #player-pin-level, #player-pin-lat, #player-pin-lng, #player-pin-login-key').text('');
       $('#player-fish').attr('src', 'assets/images/tuna1.png');
       var specifiedName = $('#record-name').val().trim();
       if ( specifiedName !== '') {

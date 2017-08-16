@@ -7,7 +7,10 @@
 	
 	<!-- favicon -->
 	<link rel="shortcut icon" type="image/png" href="assets/images/fish-level-0.png"/>
-	
+
+	<!-- Reset CSS -->
+	<link rel="stylesheet" type="text/css" href="assets/css/reset.css">	
+
 	<!-- Compiled and minified CSS -->
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.1/css/materialize.min.css">
 
@@ -15,7 +18,6 @@
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.min.css" integrity="sha384-OHBBOqpYHNsIqQy8hL1U+8OXf9hH6QRxi0+EODezv82DfnZoV7qoHAZDwMwEJvSw" crossorigin="anonymous">
 
 	<!-- Link to css files -->
-	<link rel="stylesheet" type="text/css" href="assets/css/reset.css">	
 	<link rel="stylesheet" type="text/css" href="assets/css/style.css">	
 
 	<!-- Google Font link -->
@@ -36,151 +38,153 @@
 </head>
 <body>
 
-	<div class="container">
-		<nav>
-			<div class="nav-wrapper header">
-				<a href="#" class="brand-logo title">Big Fish Little Fish</a>
-				<ul id="nav-mobile" class="right">
-					<li><a class="waves-effect waves-light btn" id="new-game">New Fish</a></li>
-				</ul>
+	<div class="container row">
+		<div class="master-wrapper col s12">
+			<nav>
+				<div class="nav-wrapper header">
+					<a href="#" class="brand-logo title left">Big Fish Little Fish</a>
+					<ul class="right">
+						<li><a class="waves-effect waves-light btn" id="new-game">New Fish</a></li>
+					</ul>
+				</div>
+			</nav>
+			<div class="main-content row">
+				<div class="col xl12 l12 m12 s12" id="map"></div>
+	   		</div>
+			<!-- Modal to ask if user has a fish or not -->
+			<div id="intro-modal" class="modal">
+				<div class="modal-content">
+					<h4>Do you want to play as an existing fish? Click "No" to create a new one.</h4>
+				</div>
+				<div class="modal-footer">
+					<a href="#!" id="exist-fish" class="modal-action modal-close btn-flat ">Yes</a>
+					<a href="#!" id="new-fish" class="modal-action modal-close btn-flat">No</a>
+				</div>
 			</div>
-		</nav>
-		<div class="main-content row">
-			<div class="col s12" id="map"></div>
-   		</div>
-		<!-- Modal to ask if user has a fish or not -->
-		<div id="intro-modal" class="modal">
-			<div class="modal-content">
-				<h4>Do you want to play as an existing fish? Click "No" to create a new one.</h4>
+			<div id="gameover-modal" class="modal">
+				<div class="modal-content">
+					<h1>GAME OVER!</h1><br>
+					<h4 id='death-level'></h4>
+				</div>
+				<div class="modal-footer">
+					<a href="#!" id="start-over" class="modal-action modal-close btn-flat ">Start Over?</a>
+				</div>
 			</div>
-			<div class="modal-footer">
-				<a href="#!" id="exist-fish" class="modal-action modal-close btn-flat ">Yes</a>
-				<a href="#!" id="new-fish" class="modal-action modal-close btn-flat">No</a>
+			<!-- Modal for user to find existing fish -->
+			<div id="username-modal" class="modal">
+				<div class="modal-content">
+					<form id="find-username">
+						What is your fish's special key?<br>
+						<input type="text" name="username" id='find-name'><br>
+						<input type="submit" value="Submit" id="find-fish-name">
+						<input type="submit" value="Back" id="back-btn">
+						<p id="invalid-key-login-message">That is an invalid key. Please try again, or create a new fish. If it used to be a valid key, then your fish was eaten.</p>
+					</form>
+				</div>
 			</div>
-		</div>
-		<div id="gameover-modal" class="modal">
-			<div class="modal-content">
-				<h1>GAME OVER!</h1><br>
-				<h4 id='death-level'></h4>
+			<!-- Modal for user to enter their fish's name -->
+			<div id="new-fish-modal" class="modal">
+				<div class="modal-content">
+					<form id="username-form">
+						Enter your fish's name<br>
+						<input type="text" name="username" id='record-name'><br>
+						<input type="submit" value="Submit" id="submit-fish-name">
+					</form>
+				</div>
 			</div>
-			<div class="modal-footer">
-				<a href="#!" id="start-over" class="modal-action modal-close btn-flat ">Start Over?</a>
-			</div>
-		</div>
-		<!-- Modal for user to find existing fish -->
-		<div id="username-modal" class="modal">
-			<div class="modal-content">
-				<form id="find-username">
-					What is your fish's special key?<br>
-					<input type="text" name="username" id='find-name'><br>
-					<input type="submit" value="Submit" id="find-fish-name">
-					<input type="submit" value="Back" id="back-btn">
-					<p id="invalid-key-login-message">That is an invalid key. Please try again, or create a new fish. If it used to be a valid key, then your fish was eaten.</p>
-				</form>
-			</div>
-		</div>
-		<!-- Modal for user to enter their fish's name -->
-		<div id="new-fish-modal" class="modal">
-			<div class="modal-content">
-				<form id="username-form">
-					Enter your fish's name<br>
-					<input type="text" name="username" id='record-name'><br>
-					<input type="submit" value="Submit" id="submit-fish-name">
-				</form>
-			</div>
-		</div>
-		<div class="info-content row">
-			<ul class="info col s12 collapsible" data-collapsible="accordion">
-				<li>
-					<div class="collapsible-header info-header">Information</div>
-					<div class="collapsible-body">
-						<div class="display-content row">
-							<div class="player-wrapper col s6">
-								<div class="row">
-									<div class="player-pic col s4">
-										<img id="munch" src="assets/images/munch.png">
-										<img id="player-fish">
-									</div>
-									<div class="player-info col s8">
-										<section>
-									        <table id="player-stats">
-									          <tr>
-									            <th>Name: </th>
-									            <td id="player-pin-name"></td>
-									          </tr>
-									          <tr>
-									            <th>Level: </th>
-									            <td id="player-pin-level"></td>
-									          </tr>
-									          <tr>
-									            <th>Latitude: </th>
-									            <td id="player-pin-lat"></td>
-									          </tr>
-									          <tr>
-									            <th>Longitude: </th>
-									            <td id="player-pin-lng"></td>
-									          </tr>
-									        </table>
-									    </section>
-								        <section class="login-key">
-								        	<h4>Login Key: </h4>
-								        	<span id="player-pin-login-key"></span>
-								        </section>
+			<div class="info-content row">
+				<ul class="info col xl12 l12 m12 s12 collapsible" data-collapsible="accordion">
+					<li>
+						<div class="collapsible-header info-header">Information</div>
+						<div class="main-info collapsible-body">
+							<div class="display-content row">
+								<div class="player-wrapper col xl6 l6 m12 s12">
+									<div class="row">
+										<div class="player-pic col xl4 l4 m4 s12">
+											<img id="munch" src="assets/images/munch.png">
+											<img id="player-fish">
+										</div>
+										<div class="player-info col xl8 l8 m8 s12">
+											<section>
+										        <table id="player-stats">
+										          <tr>
+										            <th>Name: </th>
+										            <td id="player-pin-name"></td>
+										          </tr>
+										          <tr>
+										            <th>Level: </th>
+										            <td id="player-pin-level"></td>
+										          </tr>
+										          <tr>
+										            <th>Latitude: </th>
+										            <td id="player-pin-lat"></td>
+										          </tr>
+										          <tr>
+										            <th>Longitude: </th>
+										            <td id="player-pin-lng"></td>
+										          </tr>
+										          <tr>
+										          	<th>Login Key: </th>
+										          	<td id="player-pin-login-key"></td>
+										          </tr>
+										        </table>
+										    </section>
+										</div>
 									</div>
 								</div>
-							</div>
-							<div class="info-wrapper col s6">
-								<div class="row">
-									<div class="col s4">
-										<section>
-									        <table>
-									          <tr>
-									            <th>Name: </th>
-									            <td id="fish-pin-name"></td>
-									          </tr>
-									          <tr>
-									            <th>Level: </th>
-									            <td id="fish-pin-level"></td>
-									          </tr>
-									          <tr>
-									            <th>Latitude: </th>
-									            <td id="fish-pin-lat"></td>
-									          </tr>
-									          <tr>
-									            <th>Longitude: </th>
-									            <td id="fish-pin-lng"></td>
-									          </tr>
-									        </table>
-									    </section>
-									</div>
-									<div class="col s4">
-										<section>
-									        <table>
-									          <tr>
-									            <th>Temperature(F): </th>
-									            <td id="temp"></td>
-									          </tr>
-									          <tr>
-									            <th>Sunrise: </th>
-									            <td id="sunrise"></td>
-									          </tr>
-									          <tr>
-									            <th>Sunset: </th>
-									            <td id="sunset"></td>
-									          </tr>
-									          <tr>
-									            <th>Weather: </th>
-									            <td id="weather-detail"></td>
-									          </tr>
-									        </table>
-									    </section>
+								<div class="info-wrapper col xl6 l6 m12 s12">
+									<div class="row">
+										<div class="col xl4 l6 s12 m6">
+											<section>
+										        <table id="cpu-fish-info">
+										          <tr>
+										            <th>Name: </th>
+										            <td id="fish-pin-name"></td>
+										          </tr>
+										          <tr>
+										            <th>Level: </th>
+										            <td id="fish-pin-level"></td>
+										          </tr>
+										          <tr>
+										            <th>Latitude: </th>
+										            <td id="fish-pin-lat"></td>
+										          </tr>
+										          <tr>
+										            <th>Longitude: </th>
+										            <td id="fish-pin-lng"></td>
+										          </tr>
+										        </table>
+										    </section>
+										</div>
+										<div class="col xl4 l6 s12 m6">
+											<section>
+										        <table id="weather-info">
+										          <tr>
+										            <th>Temperature(F): </th>
+										            <td id="temp"></td>
+										          </tr>
+										          <tr>
+										            <th>Sunrise: </th>
+										            <td id="sunrise"></td>
+										          </tr>
+										          <tr>
+										            <th>Sunset: </th>
+										            <td id="sunset"></td>
+										          </tr>
+										          <tr>
+										            <th>Weather: </th>
+										            <td id="weather-detail"></td>
+										          </tr>
+										        </table>
+										    </section>
+										</div>
 									</div>
 								</div>
 							</div>
 						</div>
-					</div>
-				</li>
-			</ul>
+					</li>
+				</ul>
+			</div>
 		</div>
 	</div>
 
