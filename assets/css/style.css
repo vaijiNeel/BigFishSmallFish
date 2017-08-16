@@ -8,6 +8,14 @@ table {
 	padding-top: 20px;
 
 }
+.login-key {
+	display: block;
+}
+#invalid-key-login-message {
+	display: none;
+	color: red;
+	margin-top: 1em;
+}
 
 section {
 	padding-top: 42px;

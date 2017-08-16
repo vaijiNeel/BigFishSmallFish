@@ -71,10 +71,11 @@
 		<div id="username-modal" class="modal">
 			<div class="modal-content">
 				<form id="find-username">
-					What is your fish's name<br>
+					What is your fish's special key?<br>
 					<input type="text" name="username" id='find-name'><br>
 					<input type="submit" value="Submit" id="find-fish-name">
 					<input type="submit" value="Back" id="back-btn">
+					<p id="invalid-key-login-message">That is an invalid key. Please try again, or create a new fish.</p>
 				</form>
 			</div>
 		</div>
@@ -121,6 +122,10 @@
 									          </tr>
 									        </table>
 									    </section>
+								        <section class="login-key">
+								        	<h4>Login Key: </h4>
+								        	<span id="player-pin-login-key"></span>
+								        </section>
 									</div>
 								</div>
 							</div>

@@ -1,52 +1,51 @@
  // Initialize Firebase
-  var config = {
-    apiKey: "AIzaSyBDETBXl4ZLh_0lrEcF-3zJLEUd25Hnji0",
-    authDomain: "fish-project-ca094.firebaseapp.com",
-    databaseURL: "https://fish-project-ca094.firebaseio.com",
-    projectId: "fish-project-ca094",
-    storageBucket: "fish-project-ca094.appspot.com",
-    messagingSenderId: "542377547666"
-  };
-  firebase.initializeApp(config);
-  var database = firebase.database();
+ var config = {
+  apiKey: "AIzaSyBDETBXl4ZLh_0lrEcF-3zJLEUd25Hnji0",
+  authDomain: "fish-project-ca094.firebaseapp.com",
+  databaseURL: "https://fish-project-ca094.firebaseio.com",
+  projectId: "fish-project-ca094",
+  storageBucket: "fish-project-ca094.appspot.com",
+  messagingSenderId: "542377547666"
+};
+firebase.initializeApp(config);
+var database = firebase.database();
 
-  var map = null;
-  var playerName = '';
-  var myKey = null;
-  var gameOver = false;
+var map = null;
+var myKey = null;
+var gameOver = false;
 
-  var reverseMappingDbKeyToMarker = [];
+var reverseMappingDbKeyToMarker = [];
 
-  var counter=1;
-  var icons = {
-    level0: {
-      icon: 'assets/images/fish-level-0.png',
-      highlightedIcon: 'assets/images/fish-level-0-highlighted.png'             
-    },
-    level1: {
-      icon: 'assets/images/fish-level-1.png',
-      highlightedIcon: 'assets/images/fish-level-1-highlighted.png'
-    },
-    level2: {
-      icon: 'assets/images/fish-level-2.png',
-      highlightedIcon: 'assets/images/fish-level-2-highlighted.png'
-    },
-    level3: {
-      icon: 'assets/images/fish-level-3.png',
-      highlightedIcon: 'assets/images/fish-level-3-highlighted.png'
-    },
-    level4: {
-      icon: 'assets/images/fish-level-4.png',
-      highlightedIcon: 'assets/images/fish-level-4-highlighted.png'
-    }
-  };
+var counter=1;
+var icons = {
+  level0: {
+    icon: 'assets/images/fish-level-0.png',
+    highlightedIcon: 'assets/images/fish-level-0-highlighted.png'             
+  },
+  level1: {
+    icon: 'assets/images/fish-level-1.png',
+    highlightedIcon: 'assets/images/fish-level-1-highlighted.png'
+  },
+  level2: {
+    icon: 'assets/images/fish-level-2.png',
+    highlightedIcon: 'assets/images/fish-level-2-highlighted.png'
+  },
+  level3: {
+    icon: 'assets/images/fish-level-3.png',
+    highlightedIcon: 'assets/images/fish-level-3-highlighted.png'
+  },
+  level4: {
+    icon: 'assets/images/fish-level-4.png',
+    highlightedIcon: 'assets/images/fish-level-4-highlighted.png'
+  }
+};
 
     // Records new fish name created by player
-  $("#create-fish").on('click', function() {
-    event.preventDefault();
-    playerName = $('#player-name').val().trim();
-    $('#player-name').val('');
-  });
+    $("#create-fish").on('click', function() {
+      event.preventDefault();
+      setPlayerName($('#player-name').val().trim());
+      $('#player-name').val('');
+    });
 
   // Enables bottom collapsible
   $(document).ready(function(){      
@@ -61,20 +60,43 @@
       zoom: DEFAULT_MAP_ZOOM,
       center: DEFAULT_MAP_CENTER
     });
-    if (localStorage.getItem('name') == null ) {
+    if (getPlayerName() == null ) {
       login();
     } else {loadPlayer();}
 
     // Show menu on New Game button click
     $('#new-game').on('click', function(event) {
-        event.preventDefault();
-        var fishKey = localStorage.myKey;
-        if(typeof fishKey !== "undefined") {
-          controlHighlightOfMarker(fishKey, false);
-        }
-        emptyLocalStorageFishInfo();
+      event.preventDefault();
+      var fishKey = localStorage.myKey;
+      if(typeof fishKey !== "undefined") {
+        controlHighlightOfMarker(fishKey, false);
+      }
+      emptyLocalStorageFishInfo();
       login();
     });   
+
+  // Button for searching for username
+  $('#find-fish-name').on('click', function(event) {
+    event.preventDefault();
+    var fishLoginKey = $('#find-name').val().trim();
+    var loggedInFish = getDbFishRepresentationByKey(fishLoginKey);
+    if(loggedInFish) {
+      loggedInFish.once("value", function(snapshot) {
+        var snapshotValue = snapshot.val();
+        if(snapshotValue) {
+          setAllLocalStorageFishInfo(fishLoginKey, snapshotValue.name, snapshotValue.lat, snapshotValue.lng, snapshotValue.level);
+          controlHighlightOfMarker(fishLoginKey, true);
+          $('#find-name').val('');
+          $('#username-modal').modal('close');
+          loadPlayer();
+        } else {
+          $('#invalid-key-login-message').show();
+          setTimeout(function(){ $('#invalid-key-login-message').hide(); }, 5000);
+        }
+      });
+    } 
+  });
+
     function emptyLocalStorageFishInfo() {
       localStorage.removeItem("name");
       localStorage.removeItem("myKey");
@@ -105,10 +127,10 @@
       return (database && database.ref('fish/')) ? database.ref('fish/').child(key) : null;
     }
     function deleteFishInDbByKey(key) {
-        var oldFish = getDbFishRepresentationByKey(key);
-        if(oldFish) {
-          oldFish.remove();
-        }
+      var oldFish = getDbFishRepresentationByKey(key);
+      if(oldFish) {
+        oldFish.remove();
+      }
     }
 
     // Player initial position select
@@ -117,6 +139,7 @@
         var latLng = event.latLng;
         var latitude = latLng.lat();
         var longitude = latLng.lng();
+        var playerName = getPlayerName();
 
         addMarker(latitude, longitude, playerName, 1, true);
         $('#player-pin-lat').text(parseInt(latitude));
@@ -147,13 +170,6 @@
         gameOver = true;
         login();
       }
-      // Moves the pin representing the user's fish to the location of the fish it is eating.
-      // var myFishMarker = reverseMappingDbKeyToMarker[localStorage.myKey];
-      // myFishMarker.setPosition({lat: targetLat, lng: targetLng});
-      // myFishMarker.customInfo.level++;
-      // var isHighlighted = false;
-      // myFishMarker.icon = levelImg(reverseMappingDbKeyToMarker[localStorage.myKey].customInfo.level, isHighlighted);
-      
     }, function(errorObject) {
       console.log('Errors handled: ' + errorObject.code);
     });
@@ -175,7 +191,7 @@
     if (gameOver) {
       $('#gameover-modal').modal('open');
       $('#death-level').text('You made it to level ' + localStorage.getItem('level') + '!');
-      localStorage.clear();
+      emptyLocalStorageFishInfo();
       gameOver = false;
     } else {
       $('#intro-modal').modal('open');
@@ -209,50 +225,68 @@
       event.preventDefault();
       $('#player-pin-name, #player-pin-level, #player-pin-lat, #player-pin-lng').text('');
       $('#player-fish').attr('src', 'assets/images/tuna1.png');
-      var tmp = $('#record-name').val().trim();
-      if ( tmp !== '') {
-        playerName = $('#record-name').val().trim();
+      var specifiedName = $('#record-name').val().trim();
+      if ( specifiedName !== '') {
+        setPlayerName(specifiedName);
         $('#record-name').val('');
         $('#new-fish-modal').modal('close');
-        $('#player-pin-name').text(playerName);
+        $('#player-pin-name').text(getPlayerName());
       }
     });
 
-    // Button for searching for username
-    $('#find-fish-name').on('click', function(event) {
-      event.preventDefault();
-      var tmp = $('#find-name').val().trim();
-      // needs to check if entered username is in the firebase database
-    })
+
   }
+
+  function getPlayerName() {
+    return localStorage.getItem("name");
+  }
+  function setPlayerName(name) {
+    localStorage.setItem("name", name);
+  }
+
+
+
+      function setAllLocalStorageFishInfo(fishKey, name, latitude, longitude, level) {
+        localStorage.setItem("myKey", fishKey);
+        localStorage.setItem("name", name);
+        localStorage.setItem("latitude", latitude);
+        localStorage.setItem("longitude", longitude);
+        localStorage.setItem("level", level);
+      }
 
   // Loads player fish onto screen
   function loadPlayer() {
-    playerName = localStorage.getItem("name");
-    var tmpName = localStorage.getItem("name");
-    var tmpLat = parseInt(localStorage.getItem("latitude"));
-    var tmpLong = parseInt(localStorage.getItem("longitude"));
-    var tmpLvl = localStorage.getItem("level");
+    var userName = getPlayerName();
+    var loadedLat = parseInt(localStorage.getItem("latitude"));
+    var loadedLng = parseInt(localStorage.getItem("longitude"));
+    var loadedLvl = localStorage.getItem("level");
+    var loginKey = localStorage.getItem("myKey");
+    myKey = loginKey;
 
-    $('#player-pin-name').text(tmpName);
-    $('#player-pin-level').text(tmpLvl);
-    $('#player-pin-lat').text(tmpLat);
-    $('#player-pin-lng').text(tmpLong);
-    if (tmpLvl >= 1) {
-      $('#player-fish').attr('src', 'assets/images/tuna1.png');
-    }
-    if (tmpLvl >= 2) {
-        $('#player-fish').attr('src', 'assets/images/swordfish1.png');
-      }
-    if (tmpLvl >= 3) {
-        $('#player-fish').attr('src', 'assets/images/shark.png');
-    }
-    if (tmpLvl >= 4) {
-        $('#player-fish').attr('src', 'assets/images/monster.png');
-    }
-    myKey = localStorage.getItem("myKey");
+    updatePlayerFishStatsText(userName, loadedLvl, loadedLat, loadedLng, loginKey);
+    setBigFishImage(loadedLvl);
   }
 
+  function updatePlayerFishStatsText(name, level, lat, lng, loginKey) {
+    $('#player-pin-name').text(name);
+    $('#player-pin-level').text(level);
+    $('#player-pin-lat').text(lat);
+    $('#player-pin-lng').text(lng);
+    $('#player-pin-login-key').text(loginKey);
+  }
+
+  function setBigFishImage(loadedLvl) {
+    var $playerFish = $('#player-fish');
+    if (loadedLvl <= 1) {
+      $playerFish.attr('src', 'assets/images/tuna1.png');
+    } else if (loadedLvl <= 2) {
+      $playerFish.attr('src', 'assets/images/swordfish1.png');
+    } else if (loadedLvl <= 3) {
+      $playerFish.attr('src', 'assets/images/shark.png');
+    } else {
+      $playerFish.attr('src', 'assets/images/monster.png');
+    }
+  }
   /**
   * Adds a new marker. Saves the marker to the database.
   */
@@ -285,7 +319,7 @@
       isIconHighlighted = (localStorage.myKey === dataSnapshot.key);
     } else if(typeof localStorage.name !== "undefined" && localStorage.name != "" && typeof localStorage.latitude !== "undefined" && typeof localStorage.longitude !== "undefined") {
       isIconHighlighted = (localStorage.getItem("name") == dataSnapshot.val().name && localStorage.getItem("latitude") == dataSnapshot.val().lat
-                            && localStorage.getItem("longitude") == dataSnapshot.val().lng);
+        && localStorage.getItem("longitude") == dataSnapshot.val().lng);
     }
     var iconImage = levelImg(level, isIconHighlighted);
     var marker = new google.maps.Marker({
@@ -398,7 +432,7 @@
   }
 
    //centers the map at clicked marker. 
-  function centerMapAtMarker(marker) {
+   function centerMapAtMarker(marker) {
     //if you need animation use panTo, else use setCenter    
     // map.setCenter(marker.getPosition());
     map.panTo(marker.getPosition());
@@ -449,8 +483,8 @@
       var sunset = msToTime(response.sys.sunset) + " PM";
       console.log("sunset - " + sunset);
       messageToDisplayInHTML = "Weather Details - Main: " + response.weather[0].main + ", Description: " + 
-        response.weather[0].description + ", Temperature (F): " + temp + ", Sunrise Time: " + sunrise +
-        ", Sunset Time: " + sunset;
+      response.weather[0].description + ", Temperature (F): " + temp + ", Sunrise Time: " + sunrise +
+      ", Sunset Time: " + sunset;
       console.log(messageToDisplayInHTML);
       $('#temp').text(temp);
       $('#sunrise').text(sunrise);
