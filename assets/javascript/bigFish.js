@@ -67,9 +67,49 @@
 
     // Show menu on New Game button click
     $('#new-game').on('click', function(event) {
-      event.preventDefault();
+        event.preventDefault();
+        var fishKey = localStorage.myKey;
+        if(typeof fishKey !== "undefined") {
+          controlHighlightOfMarker(fishKey, false);
+        }
+        emptyLocalStorageFishInfo();
       login();
     });   
+    function emptyLocalStorageFishInfo() {
+      localStorage.removeItem("name");
+      localStorage.removeItem("myKey");
+      localStorage.removeItem("level");
+      localStorage.removeItem("latitude");
+      localStorage.removeItem("longitude");
+    }
+    /**
+    * Can either highlight or unhighlight the marker representing a fish's marker specified by a certain key.
+    */
+    function controlHighlightOfMarker(key, isGoingToHighlight) {
+      var markerToUnhighlight = getMarkerAssociatedWithDbKey(key);
+      if(markerToUnhighlight) {
+        var markerLevel = markerToUnhighlight.customInfo.level;
+        markerToUnhighlight.setIcon(levelImg(markerLevel, isGoingToHighlight));
+      }
+    }
+    function getMarkerAssociatedWithDbKey(key) {
+      var marker = null;
+      if(typeof reverseMappingDbKeyToMarker !== "undefined" 
+        && reverseMappingDbKeyToMarker.constructor === Array 
+        && typeof reverseMappingDbKeyToMarker[key] !== "undefined") {
+        marker = reverseMappingDbKeyToMarker[key];
+      }
+      return marker;
+    }
+    function getDbFishRepresentationByKey(key) {
+      return (database && database.ref('fish/')) ? database.ref('fish/').child(key) : null;
+    }
+    function deleteFishInDbByKey(key) {
+        var oldFish = getDbFishRepresentationByKey(key);
+        if(oldFish) {
+          oldFish.remove();
+        }
+    }
 
     // Player initial position select
     google.maps.event.addListener(map, 'click', function(event) {
