@@ -135,7 +135,7 @@ var icons = {
 
     // Player initial position select
     google.maps.event.addListener(map, 'click', function(event) {
-      if (localStorage.getItem('name') == null) {
+      if (localStorage.getItem('myKey') == null) {
         var latLng = event.latLng;
         var latitude = latLng.lat();
         var longitude = latLng.lng();
